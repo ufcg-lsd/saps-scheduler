@@ -198,10 +198,16 @@ public class Scheduler {
             updateStateInCatalog(task, nextState, SapsImage.AVAILABLE, SapsImage.NON_EXISTENT_DATA,
                     SapsImage.NONE_ARREBOL_JOB_ID,
                     "updates task [" + task.getTaskId() + "] state for " + nextState.getValue());
-            String arrebolJobId = submitTaskToArrebol(task, nextState);
-            updateStateInCatalog(task, task.getState(), SapsImage.AVAILABLE, SapsImage.NON_EXISTENT_DATA, arrebolJobId,
-                    "updates task [" + task.getTaskId() + "] with Arrebol job ID [" + arrebolJobId + "]");
-            addTimestampTaskInCatalog(task, "updates task [" + task.getTaskId() + "] timestamp");
+            try {
+                String arrebolJobId = submitTaskToArrebol(task, nextState);
+                updateStateInCatalog(task, task.getState(), SapsImage.AVAILABLE, SapsImage.NON_EXISTENT_DATA, arrebolJobId,
+                        "updates task [" + task.getTaskId() + "] with Arrebol job ID [" + arrebolJobId + "]");
+                addTimestampTaskInCatalog(task, "updates task [" + task.getTaskId() + "] timestamp");
+            } catch (Exception e) {
+                updateStateInCatalog(task, ImageTaskState.FAILED, SapsImage.AVAILABLE, SapsImage.NON_EXISTENT_DATA, SapsImage.NONE_ARREBOL_JOB_ID,
+                        "Changed task [" + task.getTaskId() + "] state to FAILED");
+                addTimestampTaskInCatalog(task, "updates task [" + task.getTaskId() + "] timestamp");
+            }
         }
     }
 
@@ -286,7 +292,7 @@ public class Scheduler {
      * @return Arrebol job id
      * @throws Exception
      */
-    private String submitTaskToArrebol(SapsImage task, ImageTaskState state) {
+    private String submitTaskToArrebol(SapsImage task, ImageTaskState state) throws Exception {
         LOGGER.info("Trying submit task id [" + task.getTaskId() + "] in state " + task.getState().getValue()
                 + " to arrebol");
 
@@ -346,7 +352,7 @@ public class Scheduler {
      * @param repository task repository
      * @return task information (tag, repository, type and name)
      */
-    private ExecutionScriptTag getExecutionScriptTag(SapsImage task, String repository) {
+    private ExecutionScriptTag getExecutionScriptTag(SapsImage task, String repository) throws Exception {
         String tag = null;
         if (repository == ExecutionScriptTagUtil.PROCESSING)
             tag = task.getProcessingTag();
