@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import saps.common.utils.ExecutionScriptTagUtil;
 
 public class SchedulerMain {
 
@@ -23,7 +22,7 @@ public class SchedulerMain {
 			throw new IllegalArgumentException("The path to the execution tags file cannot be null or empty");
 		}
 
-		System.setProperty(ExecutionScriptTagUtil.EXECUTION_TAGS_FILE_PATH_KEY, executionTagsFilePath);
+		System.setProperty(Scheduler.EXECUTION_TAGS_FILE_PATH_KEY, executionTagsFilePath);
 		
 		LOGGER.info("Loading properties...");
 		final Properties properties = new Properties();

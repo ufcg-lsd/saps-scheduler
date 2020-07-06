@@ -30,6 +30,7 @@ public class Scheduler {
 
     // Constants
     public static final Logger LOGGER = Logger.getLogger(Scheduler.class);
+    public static final String EXECUTION_TAGS_FILE_PATH_KEY = "EXECUTION_SCRIPT_TAGS_FILE_PATH";
 
     // Saps Controller Variables
     private ScheduledExecutorService sapsExecutor;
@@ -353,7 +354,8 @@ public class Scheduler {
      * @return task information (tag, repository, type and name)
      */
     private ExecutionScriptTag getExecutionScriptTag(SapsImage task, String repository) throws Exception {
-        String tag = null;
+        String tagsFilePath = System.getProperty(EXECUTION_TAGS_FILE_PATH_KEY);
+        String tag;
         if (repository == ExecutionScriptTagUtil.PROCESSING)
             tag = task.getProcessingTag();
         else if (repository == ExecutionScriptTagUtil.PRE_PROCESSING)
@@ -361,7 +363,7 @@ public class Scheduler {
         else
             tag = task.getInputdownloadingTag();
 
-        return ExecutionScriptTagUtil.getExecutionScriptTag(tag, repository);
+        return ExecutionScriptTagUtil.getExecutionScriptTag(tagsFilePath, tag, repository);
     }
 
     private String getFormatImageWithDigest(ExecutionScriptTag imageDockerInfo, ImageTaskState state, SapsImage task) {
