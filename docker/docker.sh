@@ -4,7 +4,7 @@ readonly REPOSITORY=ufcgsaps/common
 readonly USAGE="usage: docker.sh {build|push|publish} <TAG>"
 readonly MY_PATH=$(cd "$(dirname "${0}")" || { echo "For some reason, the path is not accessible"; exit 1; }; pwd )
 readonly WORKING_DIRECTORY="$(dirname "${MY_PATH}")"
-readonly DOCKER_FILE_PATH="${MY_PATH}/scheduler"
+readonly DOCKER_FILE_PATH="${MY_PATH}/Dockerfile"
 
 build() {
   local TAG="${1-latest}"
