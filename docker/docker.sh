@@ -19,7 +19,7 @@ push() {
 
 main() {
   if [ "$#" -eq 0 ]; then
-      echo "Use: ${USAGE}"
+      echo "${USAGE}"
       exit 1
   fi
   case ${1} in
