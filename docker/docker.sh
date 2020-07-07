@@ -31,7 +31,7 @@ run() {
     --net="${SAPS_NETWORK}" --net-alias=scheduler \
     -v "${CONFIG_FILE_PATH}":/etc/saps/scheduler.conf \
     -v "${LOG4J_PROPERTIES_FILE_PATH}":/etc/saps/log4j.properties \
-    -v "${EXECUTION_TAGS_FILE_PATH}":/dispatcher/resources/execution_script_tags.json \
+    -v "${EXECUTION_TAGS_FILE_PATH}":/etc/saps/execution_script_tags.json \
     "${REPOSITORY}":"${TAG}"
 }
 
