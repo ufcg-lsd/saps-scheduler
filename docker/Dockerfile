@@ -6,7 +6,7 @@ COPY pom.xml .
 COPY src  ./src
 
 COPY --from=ufcgsaps/common /app/saps-common-0.0.1-SNAPSHOT.jar ./local-maven-repo/saps-common-0.0.1-SNAPSHOT.jar
-COPY --from=ufcgsaps/catalog:build /app/saps-catalog-0.0.1-SNAPSHOT.jar ./local-maven-repo/saps-catalog-0.0.1-SNAPSHOT.jar
+COPY --from=ufcgsaps/catalog:artefact-latest /app/saps-catalog-0.0.1-SNAPSHOT.jar ./local-maven-repo/saps-catalog-0.0.1-SNAPSHOT.jar
 
 RUN mvn deploy:deploy-file -DgroupId=org.fogbowcloud -DartifactId=saps-common -Dversion=0.0.1-SNAPSHOT -Durl=file:./local-maven-repo/ -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile=./local-maven-repo/saps-common-0.0.1-SNAPSHOT.jar -Dpackaging=jar
 RUN mvn deploy:deploy-file -DgroupId=org.fogbowcloud -DartifactId=saps-catalog -Dversion=0.0.1-SNAPSHOT -Durl=file:./local-maven-repo/ -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile=./local-maven-repo/saps-catalog-0.0.1-SNAPSHOT.jar -Dpackaging=jar
