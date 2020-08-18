@@ -3,57 +3,81 @@
     {
       "name":"nop",
       "docker_tag":"nop",
-      "docker_repository":"fogbow/inputdownloader"
+      "docker_repository":"fogbow/inputdownloader",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name":"nop-fake-files",
       "docker_tag":"nop-fake-files",
-      "docker_repository":"fogbow/inputdownloader"
+      "docker_repository":"fogbow/inputdownloader",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name":"nop-download-files",
       "docker_tag":"nop-download-files",
-      "docker_repository":"fogbow/inputdownloader"
+      "docker_repository":"fogbow/inputdownloader",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name": "endtoend-test",
       "docker_tag": "endtoend-test",
-      "docker_repository": "fogbow/inputdownloader"
+      "docker_repository": "fogbow/inputdownloader",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     }
   ],
   "preprocessing":[
     {
       "name":"nop",
       "docker_tag":"nop",
-      "docker_repository":"fogbow/preprocessor"
+      "docker_repository":"fogbow/preprocessor",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name":"nop-fake-files",
       "docker_tag":"nop-fake-files",
-      "docker_repository":"fogbow/preprocessor"
+      "docker_repository":"fogbow/preprocessor",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name":"nop-download-files",
       "docker_tag":"nop-download-files",
-      "docker_repository":"fogbow/preprocessor"
+      "docker_repository":"fogbow/preprocessor",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name": "endtoend-test",
       "docker_tag": "endtoend-test",
-      "docker_repository": "fogbow/preprocessor"
+      "docker_repository": "fogbow/preprocessor",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     }
   ],
   "processing":[
     {
       "name":"nop",
       "docker_tag":"nop",
-      "docker_repository":"fogbow/worker"
+      "docker_repository":"fogbow/worker",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name":"nop-fake-files",
       "docker_tag":"nop-fake-files",
-      "docker_repository":"fogbow/worker"
+      "docker_repository":"fogbow/worker",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name":"nop-download-files",
       "docker_tag":"nop-download-files",
-      "docker_repository":"fogbow/worker"
+      "docker_repository":"fogbow/worker",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     },{
       "name": "endtoend-test",
       "docker_tag": "endtoend-test",
-      "docker_repository": "fogbow/worker"
+      "docker_repository": "fogbow/worker",
+      "memory_usage":"16G",
+      "cpu_usage":"1000m"
     }
   ]
 }
