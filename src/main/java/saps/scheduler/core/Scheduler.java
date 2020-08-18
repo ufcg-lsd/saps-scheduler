@@ -298,12 +298,16 @@ public class Scheduler {
                 + " to arrebol");
 
         String repository = getRepository(state);
-        ExecutionScriptTag imageDockerInfo = getExecutionScriptTag(task, repository);
+        ExecutionScriptTag scriptInfo = getExecutionScriptTag(task, repository);
 
-        String formatImageWithDigest = getFormatImageWithDigest(imageDockerInfo, state, task);
+        String formatImageWithDigest = getFormatImageWithDigest(scriptInfo, state, task);
+        String memoryUsage = scriptInfo.getMemoryUsage();
+        String cpuUsage = scriptInfo.getCpuUsage();
 
         Map<String, String> requirements = new HashMap<String, String>();
         requirements.put("image", formatImageWithDigest);
+        requirements.put("k8sRAM", memoryUsage);
+        requirements.put("k8sCPU", cpuUsage);
 
         List<String> commands = SapsTask.buildCommandList(task, repository);
 
