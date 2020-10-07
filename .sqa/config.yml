@@ -13,5 +13,5 @@ sqa_criteria:
          commands:
            - ls -la
            - pwd
-           - mvn -B -DskipTests clean package
-           - mvn test
+           - mvn -B -DskipTests -f /scheduler-testing/pom.xml clean package
+           - mvn -f /scheduler-testing/pom.xml test
