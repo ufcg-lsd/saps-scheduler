@@ -6,7 +6,10 @@ config:
       branch: develop
 
 sqa_criteria:
-  qc_style:
-    repos:
-      saps-scheduler:
-        container: processing
+   qc_coverage:
+     repos:
+       saps-scheduler:
+         container: scheduler-testing
+         commands:
+           - mvn -B -DskipTests -f /scheduler-testing/pom.xml clean package
+           - mvn -f /scheduler-testing/pom.xml test
