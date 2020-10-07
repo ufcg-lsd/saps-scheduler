@@ -11,5 +11,7 @@ sqa_criteria:
        saps-scheduler:
          container: scheduler-testing
          commands:
+           - ls -la
+           - pwd
            - mvn -B -DskipTests clean package
            - mvn test
