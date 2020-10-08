@@ -3,6 +3,8 @@ version: "3.6"
 services:
   scheduler-testing:
     image: "maven:3-alpine"
+    container_name: scheduler-testing
+    hostname: scheduler-testing
     volumes:
      - type: bind
        source: ./saps-scheduler
