@@ -8,5 +8,5 @@ services:
     volumes:
      - type: bind
        source: ./saps-scheduler
-       target: /scheduler-testing
+       target: /saps-scheduler-repo
     command: sleep 3600
