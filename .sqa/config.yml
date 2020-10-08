@@ -12,5 +12,5 @@ sqa_criteria:
          container: scheduler-testing
          commands:
            - pwd
-           - /usr/bin/mvn -f /scheduler-testing/pom.xml -B -DskipTests clean package
-           - /usr/bin/mvn -f /scheduler-testing/pom.xml test
+           - /usr/bin/mvn -f /saps-scheduler/pom.xml -B -DskipTests clean package
+           - /usr/bin/mvn -f /saps-scheduler/pom.xml test
