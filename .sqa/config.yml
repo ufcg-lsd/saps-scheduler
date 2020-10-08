@@ -12,5 +12,5 @@ sqa_criteria:
          container: scheduler-testing
          commands:
            - pwd
-           - mvn -B -DskipTests -f /scheduler-testing/pom.xml clean package
+           - mvn -B -DskipTests clean package
            - mvn -f /scheduler-testing/pom.xml test
