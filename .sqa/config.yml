@@ -11,7 +11,5 @@ sqa_criteria:
        saps-scheduler:
          container: scheduler-testing
          commands:
-           - ls
-           - echo $PATH
            - mvn -f /saps-scheduler-repo/pom.xml -B -DskipTests clean package
-           - /usr/bin/mvn -f /saps-scheduler-repo/pom.xml test
+           - mvn -f /saps-scheduler-repo/pom.xml test
