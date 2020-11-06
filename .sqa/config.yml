@@ -13,5 +13,5 @@ sqa_criteria:
          commands:
            - ls
            - echo $PATH
-           - /usr/share/mvn -f /saps-scheduler-repo/pom.xml -B -DskipTests clean package
+           - mvn -f /saps-scheduler-repo/pom.xml -B -DskipTests clean package
            - /usr/bin/mvn -f /saps-scheduler-repo/pom.xml test
