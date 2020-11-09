@@ -31,6 +31,8 @@ public class Scheduler {
     // Constants
     public static final Logger LOGGER = Logger.getLogger(Scheduler.class);
     public static final String EXECUTION_TAGS_FILE_PATH_KEY = "EXECUTION_SCRIPT_TAGS_FILE_PATH";
+    public static final String REQUIREMENTS_CPU_REQUEST = "CPUUsage";
+    public static final String REQUIREMENTS_RAM_REQUEST = "RAMUsage";
 
     // Saps Controller Variables
     private ScheduledExecutorService sapsExecutor;
@@ -298,12 +300,16 @@ public class Scheduler {
                 + " to arrebol");
 
         String repository = getRepository(state);
-        ExecutionScriptTag imageDockerInfo = getExecutionScriptTag(task, repository);
+        ExecutionScriptTag scriptInfo = getExecutionScriptTag(task, repository);
 
-        String formatImageWithDigest = getFormatImageWithDigest(imageDockerInfo, state, task);
+        String formatImageWithDigest = getFormatImageWithDigest(scriptInfo, state, task);
+        String memoryUsage = scriptInfo.getMemoryUsage();
+        String cpuUsage = scriptInfo.getCpuUsage();
 
         Map<String, String> requirements = new HashMap<String, String>();
         requirements.put("image", formatImageWithDigest);
+        requirements.put(REQUIREMENTS_RAM_REQUEST, memoryUsage);
+        requirements.put(REQUIREMENTS_CPU_REQUEST, cpuUsage);
 
         List<String> commands = SapsTask.buildCommandList(task, repository);
 
