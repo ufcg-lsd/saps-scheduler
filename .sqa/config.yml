@@ -13,3 +13,10 @@ sqa_criteria:
          commands:
            - mvn -f /saps-scheduler-repo/pom.xml -B -DskipTests clean package
            - mvn -f /saps-scheduler-repo/pom.xml test
+
+   qc_style:
+     repos:
+       saps-scheduler:
+         container: scheduler-testing
+         commands:
+           - mvn checkstyle:checkstyle
