@@ -11,7 +11,7 @@ sqa_criteria:
        saps-scheduler:
          container: scheduler-testing
          commands:
-           - mvn checkstyle:checkstyle
+           - mvn -f /saps-scheduler-repo/pom.xml checkstyle:checkstyle
    qc_coverage:
      repos:
        saps-scheduler:
