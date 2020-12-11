@@ -38,8 +38,8 @@ mvn install
 ## Configure
 
 Edit the files:
-- [Scheduler configuration file](/config/scheduler.conf) to allow its comunication with the SAPS Catalog and Arrebol Service. This configuration file also customizes the behaviour of the Scheduler, including the frequency that the Scheduler tries to select new task to be submitted.
-- [SAPS Scripts](/resources/execution_script_tags.json) to make available new versions of the algorithms, for the three steps of the SAPS workflow (input downloading, preprocessing and processing). Any new algorithm should be packed as a docker image. See below example on how to specify the algorithms:
+- [Scheduler configuration file](https://github.com/ufcg-lsd/saps-scheduler/blob/develop/config/scheduler.conf) to allow its comunication with the SAPS Catalog and Arrebol Service. This configuration file also customizes the behaviour of the Scheduler, including the frequency that the Scheduler tries to select new task to be submitted.
+- [SAPS Scripts](https://github.com/ufcg-lsd/saps-scheduler/blob/develop/resources/execution_script_tags.json) to make available new versions of the algorithms, for the three steps of the SAPS workflow (input downloading, preprocessing and processing). Any new algorithm should be packed as a docker image. See below example on how to specify the algorithms:
 
 ```json
 {
