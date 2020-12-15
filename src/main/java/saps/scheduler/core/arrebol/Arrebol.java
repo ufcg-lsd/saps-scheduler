@@ -1,3 +1,4 @@
+/* (C)2020 */
 package saps.scheduler.core.arrebol;
 
 import java.util.List;
@@ -9,22 +10,22 @@ import saps.scheduler.core.arrebol.exceptions.GetJobException;
 import saps.scheduler.core.arrebol.exceptions.SubmitJobException;
 
 public interface Arrebol {
-	
-	public String addJob(SapsJob job) throws Exception, SubmitJobException;
 
-	public void removeJob(JobSubmitted job);
-	
-	public void addJobInList(JobSubmitted newJob);
-	
-	public void populateJobList(List<SapsImage> taskList);
+  public String addJob(SapsJob job) throws Exception, SubmitJobException;
 
-	public List<JobSubmitted> returnAllJobsSubmitted();
+  public void removeJob(JobSubmitted job);
 
-	public JobResponseDTO checkStatusJobById(String jobId) throws GetJobException;
-	
-	public List<JobResponseDTO> checkStatusJobByName(String JobName) throws GetJobException;
+  public void addJobInList(JobSubmitted newJob);
 
-	public String checkStatusJobString(String jobId) throws GetJobException;
-	
-	public int getCountSlotsInQueue(String queueId) throws GetCountsSlotsException;
+  public void populateJobList(List<SapsImage> taskList);
+
+  public List<JobSubmitted> returnAllJobsSubmitted();
+
+  public JobResponseDTO checkStatusJobById(String jobId) throws GetJobException;
+
+  public List<JobResponseDTO> checkStatusJobByName(String JobName) throws GetJobException;
+
+  public String checkStatusJobString(String jobId) throws GetJobException;
+
+  public int getCountSlotsInQueue(String queueId) throws GetCountsSlotsException;
 }
