@@ -14,12 +14,12 @@ public class DefaultRoundRobin implements Selector {
     List<String> usersForDelete = new LinkedList<String>();
 
     while (count > 0 && tasks.size() > 0) {
-      for (String user : tasks.keySet()) {
+      for (Map.Entry<String, List<SapsImage>> entry : tasks.entrySet()) {
         if (count > 0) {
-          selectedTasks.add(tasks.get(user).remove(0));
+          selectedTasks.add(entry.getValue().remove(0));
           count--;
         }
-        if (tasks.get(user).size() == 0) usersForDelete.add(user);
+        if (entry.getValue().size() == 0) usersForDelete.add(entry.getKey());
       }
 
       for (String user : usersForDelete) tasks.remove(user);

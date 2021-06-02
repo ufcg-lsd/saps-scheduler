@@ -305,10 +305,8 @@ public class Scheduler {
       mapUsersToTasks.get(user).add(task);
     }
 
-    for (String user : mapUsersToTasks.keySet()) {
-      mapUsersToTasks
-          .get(user)
-          .sort(
+    for (Map.Entry<String, List<SapsImage>> entry : mapUsersToTasks.entrySet()) {
+      entry.getValue().sort(
               new Comparator<SapsImage>() {
                 @Override
                 public int compare(SapsImage task01, SapsImage task02) {
