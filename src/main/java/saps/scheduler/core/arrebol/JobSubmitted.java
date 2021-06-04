@@ -3,6 +3,8 @@ package saps.scheduler.core.arrebol;
 
 import saps.common.core.model.SapsImage;
 
+import java.util.Objects;
+
 public class JobSubmitted {
 
   private String jobId;
@@ -28,8 +30,12 @@ public class JobSubmitted {
 
     JobSubmitted otherJob = (JobSubmitted) o;
 
-    if (this.getJobId() == otherJob.getJobId()) return true;
-    else return false;
+    return this.getJobId().equals(otherJob.getJobId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(jobId);
   }
 
   @Override
