@@ -210,11 +210,9 @@ public class Scheduler {
 
     Map<String, List<SapsImage>> tasksByUsers = mapUsers2Tasks(tasks);
 
-    LOGGER.info("Tasks by users: " + tasksByUsers);
-
     selectedTasks = selector.select(count, tasksByUsers);
 
-    LOGGER.info("Selected tasks using " + selector.version() + ": " + selectedTasks);
+    LOGGER.info("Number of selected tasks using " + selector.version() + ": " + selectedTasks.size());
     return selectedTasks;
   }
 
