@@ -209,10 +209,6 @@ public class Scheduler {
         getTasksInCatalog(state, "gets tasks with " + state.getValue() + " state");
 
     Map<String, List<SapsImage>> tasksByUsers = mapUsers2Tasks(tasks);
-    
-    List<SapsImage> allTasks = tasksByUsers.values().stream().collect(ArrayList::new, List::addAll, List::addAll);
-
-    LOGGER.info("Number of tasks: " + allTasks.size());
 
     selectedTasks = selector.select(count, tasksByUsers);
 
