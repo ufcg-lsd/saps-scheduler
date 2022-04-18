@@ -33,6 +33,7 @@ public class Scheduler {
   public static final String EXECUTION_TAGS_FILE_PATH_KEY = "EXECUTION_SCRIPT_TAGS_FILE_PATH";
   public static final String REQUIREMENTS_CPU_REQUEST = "CPUUsage";
   public static final String REQUIREMENTS_RAM_REQUEST = "RAMUsage";
+  public static final String REQUIREMENTS_EPHEMERAL_REQUEST = "EphemeralUsage";
 
   // Saps Controller Variables
   private ScheduledExecutorService sapsExecutor;
@@ -339,11 +340,13 @@ public class Scheduler {
     String formatImageWithDigest = getFormatImageWithDigest(scriptInfo, state, task);
     String memoryUsage = scriptInfo.getMemoryUsage();
     String cpuUsage = scriptInfo.getCpuUsage();
+    String ephemeralUsage = scriptInfo.getEphemeralUsage();
 
     Map<String, String> requirements = new HashMap<String, String>();
     requirements.put("image", formatImageWithDigest);
     requirements.put(REQUIREMENTS_RAM_REQUEST, memoryUsage);
     requirements.put(REQUIREMENTS_CPU_REQUEST, cpuUsage);
+    requirements.put(REQUIREMENTS_EPHEMERAL_REQUEST, ephemeralUsage);
 
     List<String> commands = SapsTask.buildCommandList(task, repository);
 
