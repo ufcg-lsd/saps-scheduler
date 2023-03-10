@@ -13,7 +13,9 @@ import saps.common.core.dto.*;
 import saps.common.core.model.SapsImage;
 import saps.common.core.model.SapsJob;
 import saps.common.core.model.SapsTask;
+import saps.common.core.model.SapsUserJob;
 import saps.common.core.model.enums.ImageTaskState;
+import saps.common.core.model.enums.JobState;
 import saps.common.exceptions.SapsException;
 import saps.common.utils.ExecutionScriptTag;
 import saps.common.utils.ExecutionScriptTagUtil;
@@ -98,6 +100,45 @@ public class Scheduler {
         Integer.parseInt(
             properties.getProperty(SapsPropertiesConstants.SAPS_EXECUTION_PERIOD_CHECKER)),
         TimeUnit.SECONDS);
+
+    sapsExecutor.scheduleWithFixedDelay(
+        () -> userJobChecker(),
+        0,
+        Integer.parseInt(
+            properties.getProperty(SapsPropertiesConstants.SAPS_EXECUTION_PERIOD_CHECKER)),
+        TimeUnit.SECONDS);
+  }
+
+  private void userJobChecker() {
+    List<SapsUserJob> ongoingUserJobs = getOngoingUserJobsInCatalog();
+
+    for (SapsUserJob userJob : ongoingUserJobs) {
+      if (userJob.getState().equals(JobState.SUBMITTED)) { 
+        updateUserJobSateInCatalog(userJob.getJobId(), JobState.RUNNING);
+        LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to CREATED");
+      }
+      
+      if (userJob.getState().equals(JobState.CREATED)) { 
+        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), "", true);
+        if (ongoingTasks.size() > 0) {
+          updateUserJobSateInCatalog(userJob.getJobId(), JobState.RUNNING);
+          LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to RUNNING");
+        }
+      }
+
+      if (userJob.getState().equals(JobState.RUNNING)) { 
+        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), "", true);
+        List<SapsImage> archivedTasks = getJobTasksInCatalog(userJob.getJobId(), ImageTaskState.ARCHIVED.getValue(), false);
+
+        if (ongoingTasks.size() == 0 && archivedTasks.size() == 0) {
+          updateUserJobSateInCatalog(userJob.getJobId(), JobState.FAILED);
+          LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to FAILED");
+        } else if (ongoingTasks.size() == 0 && archivedTasks.size() > 0){
+          updateUserJobSateInCatalog(userJob.getJobId(), JobState.FINISHED);
+          LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to FINISHED");
+        }
+      }
+    }
   }
 
   /**
@@ -643,5 +684,34 @@ public class Scheduler {
    */
   private void addTimestampTaskInCatalog(SapsImage task, String message) {
     CatalogUtils.addTimestampTask(catalog, task);
+  }
+
+
+  /**
+   * This function gets ongoing user jobs in catalog component.
+   * @return ongoing user jobs list
+   */
+  private List<SapsUserJob> getOngoingUserJobsInCatalog() {
+    return CatalogUtils.getUserJobs(catalog, "", "", 1, 5, "", "", false, true, "get jobs");
+  }
+
+  /**
+   * This function gets user job tasks in catalog component.
+   * @param jobId user job id
+   * @param state task state
+   * @param recoverOnlyOngoing flag to recover only ongoing tasks
+   * @return user job tasks list
+   */
+  private List<SapsImage> getJobTasksInCatalog(String jobId, String state, boolean recoverOnlyOngoing) {
+    return CatalogUtils.getUserJobTasks(catalog, jobId, state, "", 0, 0, "state", "asc", recoverOnlyOngoing, "get job tasks");
+  }
+
+  /**
+   * This function updates user job state in catalog component.
+   * @param jobId user job id
+   * @param state user job state
+   */
+  private void updateUserJobSateInCatalog(String jobId, JobState state) {
+    CatalogUtils.updateUserJob(catalog, jobId, state, "updating user job state");
   }
 }
