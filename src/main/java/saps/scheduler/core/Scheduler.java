@@ -112,12 +112,7 @@ public class Scheduler {
   private void userJobChecker() {
     List<SapsUserJob> ongoingUserJobs = getOngoingUserJobsInCatalog();
 
-    for (SapsUserJob userJob : ongoingUserJobs) {
-      if (userJob.getState().equals(JobState.SUBMITTED)) { 
-        updateUserJobSateInCatalog(userJob.getJobId(), JobState.RUNNING);
-        LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to CREATED");
-      }
-      
+    for (SapsUserJob userJob : ongoingUserJobs) {    
       if (userJob.getState().equals(JobState.CREATED)) { 
         List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), "", true);
         if (ongoingTasks.size() > 0) {
