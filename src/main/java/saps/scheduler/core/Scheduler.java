@@ -114,7 +114,7 @@ public class Scheduler {
 
     for (SapsUserJob userJob : ongoingUserJobs) {    
       if (userJob.getState().equals(JobState.CREATED)) { 
-        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), "", true);
+        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), null, true);
         if (ongoingTasks.size() > 0) {
           updateUserJobSateInCatalog(userJob.getJobId(), JobState.RUNNING);
           LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to RUNNING");
@@ -122,8 +122,8 @@ public class Scheduler {
       }
 
       if (userJob.getState().equals(JobState.RUNNING)) { 
-        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), "", true);
-        List<SapsImage> archivedTasks = getJobTasksInCatalog(userJob.getJobId(), ImageTaskState.ARCHIVED.getValue(), false);
+        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), null, true);
+        List<SapsImage> archivedTasks = getJobTasksInCatalog(userJob.getJobId(), ImageTaskState.ARCHIVED, false);
 
         if (ongoingTasks.size() == 0 && archivedTasks.size() == 0) {
           updateUserJobSateInCatalog(userJob.getJobId(), JobState.FAILED);
@@ -687,18 +687,18 @@ public class Scheduler {
    * @return ongoing user jobs list
    */
   private List<SapsUserJob> getOngoingUserJobsInCatalog() {
-    return CatalogUtils.getUserJobs(catalog, "", "", 1, 5, "", "", false, true, "get jobs");
+    return CatalogUtils.getUserJobs(catalog, null, "", 1, 5, "", "", false, true, false, "get jobs");
   }
 
   /**
    * This function gets user job tasks in catalog component.
    * @param jobId user job id
    * @param state task state
-   * @param recoverOnlyOngoing flag to recover only ongoing tasks
+   * @param recoverOngoing flag to recover only ongoing tasks
    * @return user job tasks list
    */
-  private List<SapsImage> getJobTasksInCatalog(String jobId, String state, boolean recoverOnlyOngoing) {
-    return CatalogUtils.getUserJobTasks(catalog, jobId, state, "", 0, 0, "state", "asc", recoverOnlyOngoing, "get job tasks");
+  private List<SapsImage> getJobTasksInCatalog(String jobId, ImageTaskState state, boolean recoverOngoing) {
+    return CatalogUtils.getUserJobTasks(catalog, jobId, state, "", 0, 0, "state", "asc", recoverOngoing, false, "get job tasks");
   }
 
   /**
