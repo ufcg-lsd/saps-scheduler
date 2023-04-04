@@ -113,19 +113,13 @@ public class Scheduler {
     List<SapsUserJob> ongoingUserJobs = getOngoingUserJobsInCatalog();
 
     for (SapsUserJob userJob : ongoingUserJobs) {    
-      if (userJob.getState().equals(JobState.CREATED)) { 
-        List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), null, true);
-        if (ongoingTasks.size() > 0) {
-          updateUserJobSateInCatalog(userJob.getJobId(), JobState.RUNNING);
-          LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to RUNNING");
-        }
-      }
-
-      if (userJob.getState().equals(JobState.RUNNING)) { 
         List<SapsImage> ongoingTasks = getJobTasksInCatalog(userJob.getJobId(), null, true);
         List<SapsImage> archivedTasks = getJobTasksInCatalog(userJob.getJobId(), ImageTaskState.ARCHIVED, false);
 
-        if (ongoingTasks.size() == 0 && archivedTasks.size() == 0) {
+        if (ongoingTasks.size() > 0) {
+          updateUserJobSateInCatalog(userJob.getJobId(), JobState.RUNNING);
+          LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to RUNNING");
+        } else if (ongoingTasks.size() == 0 && archivedTasks.size() == 0) {
           updateUserJobSateInCatalog(userJob.getJobId(), JobState.FAILED);
           LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to FAILED");
         } else if (ongoingTasks.size() == 0 && archivedTasks.size() > 0){
@@ -133,7 +127,6 @@ public class Scheduler {
           LOGGER.info("Setting the user job [" + userJob.getJobId() + "] state to FINISHED");
         }
       }
-    }
   }
 
   /**
