@@ -1,7 +1,7 @@
 /* (C)2020 */
 package saps.scheduler.core.arrebol.retry;
 
-import saps.common.core.model.SapsJob;
+import saps.scheduler.interfaces.SapsJob;
 import saps.scheduler.core.arrebol.Arrebol;
 import saps.scheduler.core.arrebol.exceptions.SubmitJobException;
 

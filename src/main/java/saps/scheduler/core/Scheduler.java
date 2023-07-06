@@ -4,19 +4,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.apache.log4j.Logger;
-import saps.catalog.core.Catalog;
-import saps.catalog.core.jdbc.JDBCCatalog;
-import saps.catalog.core.retry.CatalogUtils;
-import saps.common.core.dto.*;
-import saps.common.core.model.SapsImage;
-import saps.common.core.model.SapsJob;
-import saps.common.core.model.SapsTask;
-import saps.common.core.model.enums.ImageTaskState;
-import saps.common.exceptions.SapsException;
-import saps.common.utils.ExecutionScriptTag;
-import saps.common.utils.ExecutionScriptTagUtil;
-import saps.common.utils.SapsPropertiesConstants;
-import saps.common.utils.SapsPropertiesUtil;
+import saps.scheduler.interfaces.*;
 import saps.scheduler.core.arrebol.Arrebol;
 import saps.scheduler.core.arrebol.ArrebolUtils;
 import saps.scheduler.core.arrebol.DefaultArrebol;
@@ -139,7 +127,7 @@ public class Scheduler {
     int countUpToTasks = getCountSlotsInArrebol("default");
 
     for (ImageTaskState state : states) {
-      List<SapsImage> selectedTasksInCurrentState = selectTasksInSpecificState(countUpToTasks, state);
+      List<SapsImage> selectedTasksInCurrentState = selectTasksByState(countUpToTasks, state);
       selectedTasks.addAll(selectedTasksInCurrentState);
       countUpToTasks -= selectedTasksInCurrentState.size();
     }
@@ -284,6 +272,7 @@ public class Scheduler {
     return jobId;
   }
   
+
   /**
    * This function checks if each submitted job was finished. If exists finished jobs, for each job
    * is updates state in Catalog and removes a job by list of submitted jobs to Arrebol.

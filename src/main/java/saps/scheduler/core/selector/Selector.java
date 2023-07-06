@@ -3,7 +3,7 @@ package saps.scheduler.core.selector;
 
 import java.util.List;
 import java.util.Map;
-import saps.common.core.model.SapsImage;
+import saps.scheduler.interfaces.SapsImage;
 
 public interface Selector {
 

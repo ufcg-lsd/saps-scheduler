@@ -2,7 +2,7 @@
 package saps.scheduler.core.arrebol.retry;
 
 import java.util.List;
-import saps.common.core.dto.JobResponseDTO;
+import saps.scheduler.interfaces.JobResponseDTO;
 import saps.scheduler.core.arrebol.Arrebol;
 import saps.scheduler.core.arrebol.exceptions.GetJobException;
 
