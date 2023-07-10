@@ -336,7 +336,7 @@ public class Scheduler {
     }
   }
 
-  private boolean updateStateInCatalog(SapsImage task, ImageTaskState state, String status,
+  protected boolean updateStateInCatalog(SapsImage task, ImageTaskState state, String status,
       String error, String arrebolJobId, String message) {
     task.setState(state);
     task.setStatus(status);
@@ -443,7 +443,7 @@ public class Scheduler {
     return ArrebolUtils.getJobById(arrebol, jobId, message);
   }
 
-  private List<JobResponseDTO> getJobByNameInArrebol(String jobName, String message) {
+  protected List<JobResponseDTO> getJobByNameInArrebol(String jobName, String message) {
     return ArrebolUtils.getJobByName(arrebol, jobName, message);
   }
 
