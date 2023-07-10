@@ -1,5 +1,6 @@
 package saps.scheduler.interfaces;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class SapsImage {
@@ -28,7 +29,7 @@ public class SapsImage {
         return 0;
     }
 
-    public Object getCreationTime() {
+    public Timestamp getCreationTime() {
         return null;
     }
 
