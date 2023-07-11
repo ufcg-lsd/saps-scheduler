@@ -33,8 +33,8 @@ import saps.scheduler.core.selector.Selector;
 @PrepareForTest({CatalogUtils.class})
 public class SchedulerTest {
 
-    Scheduler scheduler;
     Properties properties;
+    Scheduler scheduler;
 
     @Mock
     Catalog catalog = mock(Catalog.class);
@@ -69,7 +69,7 @@ public class SchedulerTest {
     @Test
     public void testRecovery() throws SapsException {
 
-        scheduler = new Scheduler(properties, catalog, sapsExecutor, arrebol, selector);
+        scheduler = new DefaultScheduler(properties, catalog, sapsExecutor, arrebol, selector);
         
         List<SapsImage> tasksInProcessingState = new ArrayList<>();
         List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();
@@ -84,16 +84,9 @@ public class SchedulerTest {
         when (sapsImage1.getState().getValue()).thenReturn("1");
         when(sapsImage1.getTaskId()).thenReturn("1");
 
-        when(scheduler.getJobByNameInArrebol("1-1", "gets job by name [" + "1-1" + "]")).thenReturn(jobResponseDTOs);
-
-        when(scheduler.updateStateInCatalog(sapsImage1, sapsImage1.getState(), SapsImage.AVAILABLE,
-        SapsImage.NON_EXISTENT_DATA, jobResponseDTOs.get(0).getId(), 
-        "updates task [" + sapsImage1.getTaskId() + "] with Arrebol job ID [" + jobResponseDTOs.get(0).getId() + "]"));
-
+        assertTrue(sapsImage1.getState().equals(ImageTaskState.CREATED));
         scheduler.recovery();
-
         assertTrue(sapsImage1.getState().equals(ImageTaskState.DOWNLOADING));
-
 
     }
 
