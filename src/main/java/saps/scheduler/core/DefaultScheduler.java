@@ -26,20 +26,19 @@ public class DefaultScheduler implements Scheduler {
   private Catalog catalog;
   private Arrebol arrebol;
 
-  public DefaultScheduler(Properties properties) throws SapsException {
+  public DefaultScheduler(Properties properties) throws IllegalArgumentException {
     this(
         properties,
         new JDBCCatalog(properties),
-        Executors.newScheduledThreadPool(1),
         new DefaultArrebol(properties),
         new DefaultRoundRobin());
   }
 
-  public DefaultScheduler(Properties properties, Catalog catalog, ScheduledExecutorService sapsExecutor,
-    Arrebol arrebol, Selector selector) throws SapsException {
+  public DefaultScheduler(Properties properties, Catalog catalog,
+    Arrebol arrebol, Selector selector) throws IllegalArgumentException {
     
     if (!checkProperties(properties))
-      throw new SapsException("Error on validate the file. Missing properties for start Scheduler Component.");
+      throw new IllegalArgumentException("Error on validate the file. Missing properties for start Scheduler Component.");
 
     this.catalog = catalog;
     this.arrebol = arrebol;
@@ -60,9 +59,11 @@ public class DefaultScheduler implements Scheduler {
    * This function retrieves consistency between the information present in Catalog and Arrebol, and
    * starts the list of submitted jobs.
    */
-    public void recovery() {
+    public List<SapsImage> recovery() {
     List<SapsImage> tasksInProcessingState = getProcessingTasksInCatalog();
     List<SapsImage> tasksForPopulateSubmittedJobList = new ArrayList<>();
+
+    List<SapsImage> updatedTasks = new ArrayList<>();
 
       for (SapsImage task : tasksInProcessingState) {
         if (task.getArrebolJobId().equals(SapsImage.NONE_ARREBOL_JOB_ID)) {
@@ -84,6 +85,7 @@ public class DefaultScheduler implements Scheduler {
               arrebolJobId,
               "updates task [" + task.getTaskId() + "] with Arrebol job ID [" + arrebolJobId + "]");
           tasksForPopulateSubmittedJobList.add(task);
+          updatedTasks.add(task);
         } 
       }
       else {
@@ -91,7 +93,9 @@ public class DefaultScheduler implements Scheduler {
         arrebol.addJobInList(new JobSubmitted(arrebolJobId, task));
       }
     };
+
     arrebol.populateJobList(tasksForPopulateSubmittedJobList);
+    return updatedTasks;
   }
 
   /**

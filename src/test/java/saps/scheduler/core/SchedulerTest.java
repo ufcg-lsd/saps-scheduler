@@ -2,7 +2,8 @@
 package saps.scheduler.core;
 
 import static org.junit.Assert.*;
-
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,12 +26,13 @@ import org.junit.runner.RunWith;
 
 import saps.scheduler.interfaces.*;
 import saps.scheduler.core.arrebol.Arrebol;
+import saps.scheduler.core.arrebol.ArrebolUtils;
 import saps.scheduler.core.arrebol.exceptions.GetCountsSlotsException;
 import saps.scheduler.core.selector.DefaultRoundRobin;
 import saps.scheduler.core.selector.Selector;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CatalogUtils.class})
+@PrepareForTest({CatalogUtils.class, ArrebolUtils.class})
 public class SchedulerTest {
 
     Properties properties;
@@ -38,9 +40,6 @@ public class SchedulerTest {
 
     @Mock
     Catalog catalog = mock(Catalog.class);
-
-    @Mock
-    ScheduledExecutorService sapsExecutor = mock(ScheduledExecutorService.class);
 
     @Mock
     Selector selector = mock(Selector.class);
@@ -67,28 +66,28 @@ public class SchedulerTest {
     }
 
     @Test
-    public void testRecovery() throws SapsException {
+    public void testRecovery() {
+        scheduler = new DefaultScheduler(properties, catalog, arrebol, selector);
+        PowerMockito.mockStatic(CatalogUtils.class);
+        PowerMockito.mockStatic(ArrebolUtils.class);
 
-        scheduler = new DefaultScheduler(properties, catalog, sapsExecutor, arrebol, selector);
-        
         List<SapsImage> tasksInProcessingState = new ArrayList<>();
         List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();
 
         tasksInProcessingState.add(sapsImage1);
-        tasksInProcessingState.add(sapsImage2);
         jobResponseDTOs.add(jobResponseDTO);
 
-        sapsImage1.setState(ImageTaskState.CREATED);
+        when(CatalogUtils.getProcessingTasks(catalog, "gets tasks in processing state")).thenReturn(tasksInProcessingState);
+        when(ArrebolUtils.getJobByName(eq(arrebol), anyString(), anyString())).thenReturn(jobResponseDTOs);
 
-        when (sapsImage1.getArrebolJobId().equals(SapsImage.NONE_ARREBOL_JOB_ID)).thenReturn(true);
-        when (sapsImage1.getState().getValue()).thenReturn("1");
+        when(sapsImage1.getArrebolJobId()).thenReturn(SapsImage.NONE_ARREBOL_JOB_ID);
+        when(sapsImage1.getState()).thenReturn(ImageTaskState.CREATED);
         when(sapsImage1.getTaskId()).thenReturn("1");
 
-        assertTrue(sapsImage1.getState().equals(ImageTaskState.CREATED));
-        scheduler.recovery();
-        assertTrue(sapsImage1.getState().equals(ImageTaskState.DOWNLOADING));
+        when(jobResponseDTO.getId()).thenReturn("1-1");
 
+        System.out.println(sapsImage1.getState());
+        assertEquals(tasksInProcessingState, scheduler.recovery());
     }
-
   
 }
