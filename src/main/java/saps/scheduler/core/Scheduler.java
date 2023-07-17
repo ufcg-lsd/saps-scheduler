@@ -23,5 +23,10 @@ public interface Scheduler {
     */
     public void checker();
 
+    /*
+     * These methods above shouldn't be public. 
+     * We'll change they visibility as soon as we finish testing
+     */
+
     
 }

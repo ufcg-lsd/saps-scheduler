@@ -1,36 +1,35 @@
 /* (C)2020 */
 package saps.scheduler.core;
 
-import static org.junit.Assert.*;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.mockito.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import saps.scheduler.interfaces.*;
 import saps.scheduler.core.arrebol.Arrebol;
-import saps.scheduler.core.arrebol.exceptions.GetCountsSlotsException;
-import saps.scheduler.core.selector.DefaultRoundRobin;
+import saps.scheduler.core.arrebol.ArrebolUtils;
+import saps.scheduler.core.arrebol.JobSubmitted;
 import saps.scheduler.core.selector.Selector;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CatalogUtils.class})
+@PrepareForTest({CatalogUtils.class, ArrebolUtils.class})
 public class SchedulerTest {
 
     Properties properties;
@@ -40,13 +39,13 @@ public class SchedulerTest {
     Catalog catalog = mock(Catalog.class);
 
     @Mock
-    ScheduledExecutorService sapsExecutor = mock(ScheduledExecutorService.class);
-
-    @Mock
     Selector selector = mock(Selector.class);
 
     @Mock
     JobResponseDTO jobResponseDTO = mock(JobResponseDTO.class);
+
+    @Mock
+    JobSubmitted JobSubmitted = mock(JobSubmitted.class);
 
     @Mock
     Arrebol arrebol = mock(Arrebol.class);
@@ -66,29 +65,56 @@ public class SchedulerTest {
         properties = new Properties();
     }
 
-    @Test
-    public void testRecovery() throws SapsException {
+     @Test
+    public void testChecker() {
 
-        scheduler = new DefaultScheduler(properties, catalog, sapsExecutor, arrebol, selector);
+        ImageTaskState nextState = ImageTaskState.FINISHED;
+
+
+        // Crie os mocks
+        Arrebol mockArrebol = mock(Arrebol.class);
+        JobSubmitted mockJob = mock(JobSubmitted.class);
+        SapsImage mockTask = mock(SapsImage.class);
+        JobResponseDTO mockJobResponse = mock(JobResponseDTO.class);
         
-        List<SapsImage> tasksInProcessingState = new ArrayList<>();
-        List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();
+        // Crie a lista de jobs
+        List<JobSubmitted> submittedJobs = Arrays.asList(mockJob);
+        
+        // Configure os mocks para retornar os valores esperados
+        when(mockJob.getJobId()).thenReturn("Mock Job ID");
+        when(mockJob.getImageTask()).thenReturn(mockTask);
+        when(mockArrebol.returnAllJobsSubmitted()).thenReturn(submittedJobs);
+        
+        // Crie a instância da classe que contém o método que você deseja testar
+        DefaultScheduler defaultScheduler = new DefaultScheduler(properties, catalog, mockArrebol, selector);
+        
+        // Use PowerMockito para fazer o mock dos métodos internos
+        DefaultScheduler spyDefaultScheduler = spy(defaultScheduler);
+        
+        doReturn(mockJobResponse).when(spyDefaultScheduler).getJobByIdInArrebol(anyString(), anyString());
+        doReturn(true).when(spyDefaultScheduler).checkJobWasFinish(mockJobResponse);
+        doReturn(true).when(spyDefaultScheduler).checkJobFinishedWithSucess(mockJobResponse);
 
-        tasksInProcessingState.add(sapsImage1);
-        tasksInProcessingState.add(sapsImage2);
-        jobResponseDTOs.add(jobResponseDTO);
+        doReturn(nextState).when(spyDefaultScheduler).getNextState(any(ImageTaskState.class));
 
-        sapsImage1.setState(ImageTaskState.CREATED);
+        
+        when(mockTask.getTaskId()).thenReturn("123");
 
-        when (sapsImage1.getArrebolJobId().equals(SapsImage.NONE_ARREBOL_JOB_ID)).thenReturn(true);
-        when (sapsImage1.getState().getValue()).thenReturn("1");
-        when(sapsImage1.getTaskId()).thenReturn("1");
+        when(mockTask.getState()).thenReturn(ImageTaskState.CREATED);
 
-        assertTrue(sapsImage1.getState().equals(ImageTaskState.CREATED));
-        scheduler.recovery();
-        assertTrue(sapsImage1.getState().equals(ImageTaskState.DOWNLOADING));
+        doReturn(ImageTaskState.FINISHED).when(spyDefaultScheduler).getNextState(any(ImageTaskState.class));
 
+        
+        // Chame o método
+        spyDefaultScheduler.checker();
+        
+        
+        // Verifique se os métodos foram chamados com os argumentos corretos
+        verify(spyDefaultScheduler, times(1)).getJobByIdInArrebol(anyString(), anyString());
+        verify(spyDefaultScheduler, times(1)).checkJobWasFinish(mockJobResponse);
+        verify(spyDefaultScheduler, times(1)).checkJobFinishedWithSucess(mockJobResponse);
+        verify(mockArrebol, times(1)).returnAllJobsSubmitted();
+        verify(mockArrebol, times(1)).removeJob(mockJob);
     }
 
-  
-}
+}   

@@ -5,16 +5,19 @@ import java.util.List;
 
 public class SapsImage {
 
-    public static String NONE_ARREBOL_JOB_ID = null;
-    public static String AVAILABLE = null;
-    public static String NON_EXISTENT_DATA = null;
+    public static String NONE_ARREBOL_JOB_ID = "x";
+    public static String AVAILABLE = "y";
+    public static String NON_EXISTENT_DATA = "z";
+    private ImageTaskState state = ImageTaskState.CREATED;
+    private String status = "?";
+    private String error = "!";
 
     public String getArrebolJobId() {
-        return "";
+        return "x";
     }
 
     public ImageTaskState getState() {
-        return ImageTaskState.CREATED;
+        return this.state;
     }
 
     public String getTaskId() {
@@ -33,11 +36,17 @@ public class SapsImage {
         return null;
     }
 
-    public void setState(ImageTaskState state) {}
+    public void setState(ImageTaskState state) {
+        this.state = state;
+    }
 
-    public void setStatus(String status) {}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-    public void setError(String error) {}
+    public void setError(String error) {
+        this.error = error;
+    }
 
     public void setArrebolJobId(String arrebolJobId) {}
 

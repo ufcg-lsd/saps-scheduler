@@ -5,7 +5,7 @@ import java.util.List;
 public interface CatalogUtils {
 
     static boolean updateState(Catalog catalog, SapsImage task) {
-        return false;
+        return true;
     }
 
     static void addTimestampTask(Catalog catalog, SapsImage task) {

@@ -1,15 +1,26 @@
 package saps.scheduler.interfaces;
 
-public interface ImageTaskState {
+public enum ImageTaskState {
+  CREATED("created"),
+  DOWNLOADING("downloading"),
+  DOWNLOADED("downloaded"),
+  PREPROCESSING("preprocessing"),
+  PREPROCESSED("preprocessed"),
+  READY("ready"),
+  RUNNING("running"),
+  FINISHED("finished"),
+  ARCHIVING("archiving"),
+  ARCHIVED("archived"),
+  FAILED("failed");
+  private String value;
 
-    ImageTaskState READY = null;
-    ImageTaskState DOWNLOADED = null;
-    ImageTaskState CREATED = null;
-    ImageTaskState FAILED = null;
-    ImageTaskState DOWNLOADING = null;
-    ImageTaskState PREPROCESSING = null;
-    ImageTaskState RUNNING = null;
-    ImageTaskState FINISHED = null;
-    String getValue();
+  
+  private ImageTaskState(String value) {
+    this.value = value;
+  }
+
+  public String getValue() {
+    return value;
+  }
 
 }

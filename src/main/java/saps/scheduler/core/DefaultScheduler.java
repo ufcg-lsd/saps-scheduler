@@ -26,20 +26,19 @@ public class DefaultScheduler implements Scheduler {
   private Catalog catalog;
   private Arrebol arrebol;
 
-  public DefaultScheduler(Properties properties) throws SapsException {
+  public DefaultScheduler(Properties properties) throws IllegalArgumentException {
     this(
         properties,
         new JDBCCatalog(properties),
-        Executors.newScheduledThreadPool(1),
         new DefaultArrebol(properties),
         new DefaultRoundRobin());
   }
 
-  public DefaultScheduler(Properties properties, Catalog catalog, ScheduledExecutorService sapsExecutor,
-    Arrebol arrebol, Selector selector) throws SapsException {
+  public DefaultScheduler(Properties properties, Catalog catalog,
+    Arrebol arrebol, Selector selector) throws IllegalArgumentException {
     
     if (!checkProperties(properties))
-      throw new SapsException("Error on validate the file. Missing properties for start Scheduler Component.");
+      throw new IllegalArgumentException("Error on validate the file. Missing properties for start Scheduler Component.");
 
     this.catalog = catalog;
     this.arrebol = arrebol;
@@ -285,12 +284,13 @@ public class DefaultScheduler implements Scheduler {
     LOGGER.info("Submmitteds jobs list: " + submittedJobs.toString());
 
     for (JobSubmitted job : submittedJobs) {
+      System.out.println(job);
       String jobId = job.getJobId();
       SapsImage task = job.getImageTask();
 
       JobResponseDTO jobResponse = getJobByIdInArrebol(jobId, "gets job by ID [" + jobId + "]");
       LOGGER.debug("Job [" + jobId + "] information returned from Arrebol: " + jobResponse);
-      
+
       boolean checkFinish = checkJobWasFinish(jobResponse);
       if (checkFinish) {
         LOGGER.info("Job [" + jobId + "] has been finished");
@@ -301,6 +301,7 @@ public class DefaultScheduler implements Scheduler {
           LOGGER.info("Job [" + jobId + "] has been finished with success");
 
           ImageTaskState nextState = getNextState(task.getState());
+
           updateStateInCatalog(
               task,
               nextState,
@@ -338,6 +339,7 @@ public class DefaultScheduler implements Scheduler {
 
   protected boolean updateStateInCatalog(SapsImage task, ImageTaskState state, String status,
       String error, String arrebolJobId, String message) {
+        
     task.setState(state);
     task.setStatus(status);
     task.setError(error);
@@ -354,19 +356,20 @@ public class DefaultScheduler implements Scheduler {
     return ArrebolUtils.submitJob(arrebol, imageJob, message);
   }
 
-  private boolean checkJobWasFinish(JobResponseDTO jobResponse) {
+  public boolean checkJobWasFinish(JobResponseDTO jobResponse) {
+
     String jobId = jobResponse.getId();
     String jobState = jobResponse.getJobState().toUpperCase();
 
     LOGGER.info("Checking if job ["+ jobId +"] was finished. State job: { " + jobState + "}");
 
     if (jobState.compareTo(TaskResponseDTO.STATE_FAILED) != 0
-        && jobState.compareTo(TaskResponseDTO.STATE_FINISHED) != 0) return false;
+         && jobState.compareTo(TaskResponseDTO.STATE_FINISHED) != 0) return false;
     
         return true;
   }
 
-  private boolean checkJobFinishedWithSucess(JobResponseDTO jobResponse) {
+  public boolean checkJobFinishedWithSucess(JobResponseDTO jobResponse) {
     for (TaskResponseDTO task : jobResponse.getTasks()) {
       TaskSpecResponseDTO taskSpec = task.getTaskSpec();
 
@@ -384,7 +387,7 @@ public class DefaultScheduler implements Scheduler {
     return true;
   }
 
-  private ImageTaskState getNextState(ImageTaskState currentState) {
+  ImageTaskState getNextState(ImageTaskState currentState) {
     Map<ImageTaskState, ImageTaskState> statesMap = new HashMap<>();
 
     statesMap.put(ImageTaskState.CREATED, ImageTaskState.DOWNLOADING);
@@ -439,7 +442,7 @@ public class DefaultScheduler implements Scheduler {
     return ArrebolUtils.getCountSlots(arrebol, queueId);
   }
 
-  private JobResponseDTO getJobByIdInArrebol(String jobId, String message) {
+  JobResponseDTO getJobByIdInArrebol(String jobId, String message) {
     return ArrebolUtils.getJobById(arrebol, jobId, message);
   }
 
