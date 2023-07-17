@@ -4,17 +4,21 @@ package saps.scheduler.core;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.mockito.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -116,5 +120,30 @@ public class SchedulerTest {
         verify(mockArrebol, times(1)).returnAllJobsSubmitted();
         verify(mockArrebol, times(1)).removeJob(mockJob);
     }
+   
+    @Test
+    public void testRecovery() {
+        scheduler = new DefaultScheduler(properties, catalog, arrebol, selector);
+        PowerMockito.mockStatic(CatalogUtils.class);
+        PowerMockito.mockStatic(ArrebolUtils.class);
 
-}   
+        List<SapsImage> tasksInProcessingState = new ArrayList<>();
+        List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();
+
+        tasksInProcessingState.add(sapsImage1);
+        jobResponseDTOs.add(jobResponseDTO);
+
+        when(CatalogUtils.getProcessingTasks(catalog, "gets tasks in processing state")).thenReturn(tasksInProcessingState);
+        when(ArrebolUtils.getJobByName(eq(arrebol), anyString(), anyString())).thenReturn(jobResponseDTOs);
+
+        when(sapsImage1.getArrebolJobId()).thenReturn(SapsImage.NONE_ARREBOL_JOB_ID);
+        when(sapsImage1.getState()).thenReturn(ImageTaskState.CREATED);
+        when(sapsImage1.getTaskId()).thenReturn("1");
+
+        when(jobResponseDTO.getId()).thenReturn("1-1");
+
+        System.out.println(sapsImage1.getState());
+        assertEquals(tasksInProcessingState, scheduler.recovery());
+    }
+  
+}

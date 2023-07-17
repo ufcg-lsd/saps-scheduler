@@ -15,7 +15,7 @@ public interface Scheduler {
     * This function retrieves consistency between the information present in Catalog and Arrebol, and
     * starts the list of submitted jobs.
     */
-    public void recovery();
+    public List<SapsImage> recovery();
 
     /**
     * This function checks if each submitted job was finished. If exists finished jobs, for each job

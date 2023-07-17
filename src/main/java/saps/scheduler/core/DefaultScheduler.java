@@ -59,9 +59,11 @@ public class DefaultScheduler implements Scheduler {
    * This function retrieves consistency between the information present in Catalog and Arrebol, and
    * starts the list of submitted jobs.
    */
-    public void recovery() {
+    public List<SapsImage> recovery() {
     List<SapsImage> tasksInProcessingState = getProcessingTasksInCatalog();
     List<SapsImage> tasksForPopulateSubmittedJobList = new ArrayList<>();
+
+    List<SapsImage> updatedTasks = new ArrayList<>();
 
       for (SapsImage task : tasksInProcessingState) {
         if (task.getArrebolJobId().equals(SapsImage.NONE_ARREBOL_JOB_ID)) {
@@ -83,6 +85,7 @@ public class DefaultScheduler implements Scheduler {
               arrebolJobId,
               "updates task [" + task.getTaskId() + "] with Arrebol job ID [" + arrebolJobId + "]");
           tasksForPopulateSubmittedJobList.add(task);
+          updatedTasks.add(task);
         } 
       }
       else {
@@ -90,7 +93,9 @@ public class DefaultScheduler implements Scheduler {
         arrebol.addJobInList(new JobSubmitted(arrebolJobId, task));
       }
     };
+
     arrebol.populateJobList(tasksForPopulateSubmittedJobList);
+    return updatedTasks;
   }
 
   /**
