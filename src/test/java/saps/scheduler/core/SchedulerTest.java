@@ -21,7 +21,10 @@ import org.mockito.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,6 +65,18 @@ public class SchedulerTest {
 
     @Mock 
     SapsImage sapsImage3 = mock(SapsImage.class);
+    
+    @Mock 
+    SapsImage sapsImage4 = mock(SapsImage.class);
+
+    @Mock 
+    SapsImage sapsImage5 = mock(SapsImage.class);
+
+    @Mock 
+    SapsImage sapsImage6 = mock(SapsImage.class);
+
+    @Mock
+    SapsUser sapsUser = mock(SapsUser.class);
 
     @Before
     public void setup() {
@@ -69,7 +84,7 @@ public class SchedulerTest {
         properties = new Properties();
     }
 
-     @Test
+    @Test
     public void testChecker() {
 
         ImageTaskState nextState = ImageTaskState.FINISHED;
@@ -123,7 +138,7 @@ public class SchedulerTest {
    
     @Test
     public void testRecovery() {
-        scheduler = new DefaultScheduler(properties, catalog, arrebol, selector);
+        DefaultScheduler scheduler = new DefaultScheduler(properties, catalog, arrebol, selector);
         PowerMockito.mockStatic(CatalogUtils.class);
         PowerMockito.mockStatic(ArrebolUtils.class);
 
@@ -144,6 +159,60 @@ public class SchedulerTest {
 
         System.out.println(sapsImage1.getState());
         assertEquals(tasksInProcessingState, scheduler.recovery());
+    }
+
+    @Test
+    public void testSchedule() {
+        DefaultScheduler dScheduler = new DefaultScheduler(properties, catalog, arrebol, selector);
+        DefaultScheduler spyScheduler = spy(dScheduler);
+        PowerMockito.mockStatic(CatalogUtils.class);
+        PowerMockito.mockStatic(ArrebolUtils.class);
+        SapsUser sapsUser1 = mock(SapsUser.class);
+
+        List<SapsImage> selectedTasks = new ArrayList<>();
+        Map<String, List<SapsImage>> mapUsers2Tasks = new TreeMap<String, List<SapsImage>>();
+
+        List<SapsImage> createdTasks = new ArrayList<>();
+        List<SapsImage> readyTasks = new ArrayList<>();
+        List<SapsImage> downloadedTasks = new ArrayList<>();
+
+        sapsImage1.setState(ImageTaskState.CREATED);
+        createdTasks.add(sapsImage1);
+
+        sapsImage3.setState(ImageTaskState.DOWNLOADED);
+        downloadedTasks.add(sapsImage3);
+
+        sapsImage2.setState(ImageTaskState.READY);
+        readyTasks.add(sapsImage2);
+        sapsImage4.setState(ImageTaskState.READY);
+        readyTasks.add(sapsImage4);
+
+        sapsImage5.setState(ImageTaskState.RUNNING);
+        sapsImage6.setState(ImageTaskState.PREPROCESSING);
+
+        selectedTasks.add(sapsImage1);
+        selectedTasks.add(sapsImage2);
+        selectedTasks.add(sapsImage3);
+        selectedTasks.add(sapsImage4);
+
+        when(sapsUser1.getId()).thenReturn("user1");
+
+        when(sapsImage1.getUser()).thenReturn("user1");
+        when(sapsImage2.getUser()).thenReturn("user1");
+        when(sapsImage3.getUser()).thenReturn("user1");
+        when(sapsImage4.getUser()).thenReturn("user1");
+
+        mapUsers2Tasks.put("user1", selectedTasks);
+
+        when(ArrebolUtils.getCountSlots(eq(arrebol), anyString())).thenReturn(5);
+        when(CatalogUtils.getTasks(catalog, ImageTaskState.CREATED)).thenReturn(createdTasks);
+        when(CatalogUtils.getTasks(catalog, ImageTaskState.READY)).thenReturn(readyTasks);
+        when(CatalogUtils.getTasks(catalog, ImageTaskState.DOWNLOADED)).thenReturn(downloadedTasks);
+        
+        doReturn(mapUsers2Tasks).when(spyScheduler).mapUsers2Tasks(selectedTasks);
+
+        //perhaps a spy should resolve the nullpointer 
+        assertEquals(selectedTasks, spyScheduler.schedule());  
     }
   
 }

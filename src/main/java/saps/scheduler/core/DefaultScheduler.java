@@ -1,8 +1,6 @@
 package saps.scheduler.core;
 
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.apache.log4j.Logger;
 import saps.scheduler.interfaces.*;
 import saps.scheduler.core.arrebol.Arrebol;
@@ -112,9 +110,11 @@ public class DefaultScheduler implements Scheduler {
   }
 
   /** This function schedules up to tasks. */
-  public void schedule() {
+  public List<SapsImage> schedule() {
     List<SapsImage> selectedTasks = selectTasks();
     submitTasks(selectedTasks);
+
+    return selectedTasks;
   }
 
   /**
@@ -122,7 +122,7 @@ public class DefaultScheduler implements Scheduler {
    *
    * @return selected tasks list
    */
-  protected List<SapsImage> selectTasks() {
+  public List<SapsImage> selectTasks() {
     List<SapsImage> selectedTasks = new LinkedList<SapsImage>();
     ImageTaskState[] states = {
       ImageTaskState.READY, ImageTaskState.DOWNLOADED, ImageTaskState.CREATED
@@ -165,7 +165,7 @@ public class DefaultScheduler implements Scheduler {
    *
    * @param selectedTasks selected task list for submit to Arrebol
    */
-  protected void submitTasks(List<SapsImage> selectedTasks) {
+  public void submitTasks(List<SapsImage> selectedTasks) {
     for (SapsImage task : selectedTasks) {
       ImageTaskState nextState = getNextState(task.getState());
 

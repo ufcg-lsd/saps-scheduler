@@ -1,7 +1,6 @@
 package saps.scheduler.interfaces;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 public class SapsImage {
 

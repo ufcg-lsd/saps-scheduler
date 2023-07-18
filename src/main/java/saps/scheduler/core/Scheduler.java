@@ -2,14 +2,12 @@ package saps.scheduler.core;
 
 import java.util.List;
 
-import saps.scheduler.interfaces.ImageTaskState;
-import saps.scheduler.interfaces.JobResponseDTO;
 import saps.scheduler.interfaces.SapsImage;
 
 public interface Scheduler {
 
     /** This function schedules up to tasks. */
-    public void schedule();
+    public List<SapsImage> schedule();
 
     /**
     * This function retrieves consistency between the information present in Catalog and Arrebol, and
@@ -27,6 +25,10 @@ public interface Scheduler {
      * These methods above shouldn't be public. 
      * We'll change they visibility as soon as we finish testing
      */
+
+    public List<SapsImage> selectTasks();
+
+
 
     
 }
