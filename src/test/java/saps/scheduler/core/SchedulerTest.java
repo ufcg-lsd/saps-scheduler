@@ -18,6 +18,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.mockito.*;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -202,17 +203,24 @@ public class SchedulerTest {
         when(sapsImage3.getUser()).thenReturn("user1");
         when(sapsImage4.getUser()).thenReturn("user1");
 
+        when(sapsImage1.getCreationTime()).thenReturn(Timestamp.valueOf("2022-01-01 12:00:00"));
+        when(sapsImage2.getCreationTime()).thenReturn(Timestamp.valueOf("2022-02-15 09:30:00"));
+        when(sapsImage3.getCreationTime()).thenReturn(Timestamp.valueOf("2022-06-30 18:45:00"));
+        when(sapsImage4.getCreationTime()).thenReturn(Timestamp.valueOf("2022-12-25 00:00:00"));
+        
         mapUsers2Tasks.put("user1", selectedTasks);
 
-        when(ArrebolUtils.getCountSlots(eq(arrebol), anyString())).thenReturn(5);
+        when(ArrebolUtils.getCountSlots(eq(arrebol), anyString())).thenReturn(10);
         when(CatalogUtils.getTasks(catalog, ImageTaskState.CREATED)).thenReturn(createdTasks);
         when(CatalogUtils.getTasks(catalog, ImageTaskState.READY)).thenReturn(readyTasks);
         when(CatalogUtils.getTasks(catalog, ImageTaskState.DOWNLOADED)).thenReturn(downloadedTasks);
         
         doReturn(mapUsers2Tasks).when(spyScheduler).mapUsers2Tasks(selectedTasks);
+        
+        spyScheduler.schedule();
 
-        //perhaps a spy should resolve the nullpointer 
-        assertEquals(selectedTasks, spyScheduler.schedule());  
+        verify(spyScheduler, times(1)).selectTasks();
+        verify(spyScheduler, times(1)).submitTasks(any());
     }
   
 }
