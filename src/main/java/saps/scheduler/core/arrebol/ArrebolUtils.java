@@ -3,8 +3,8 @@ package saps.scheduler.core.arrebol;
 
 import java.util.List;
 import org.apache.log4j.Logger;
-import saps.scheduler.interfaces.JobResponseDTO;
-import saps.scheduler.interfaces.SapsJob;
+import saps.common.core.dto.JobResponseDTO;
+import saps.common.core.model.SapsJob;
 import saps.scheduler.core.arrebol.exceptions.GetCountsSlotsException;
 import saps.scheduler.core.arrebol.exceptions.GetJobException;
 import saps.scheduler.core.arrebol.exceptions.SubmitJobException;
@@ -13,6 +13,7 @@ import saps.scheduler.core.arrebol.retry.GetJobByIdRetry;
 import saps.scheduler.core.arrebol.retry.GetJobByNameRetry;
 import saps.scheduler.core.arrebol.retry.LenQueueRetry;
 import saps.scheduler.core.arrebol.retry.SubmitJobRetry;
+
 
 public class ArrebolUtils {
 

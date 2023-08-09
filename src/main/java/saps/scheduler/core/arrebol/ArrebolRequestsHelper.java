@@ -12,13 +12,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
-import saps.scheduler.interfaces.JobResponseDTO;
-import saps.scheduler.interfaces.SapsJob;
-import saps.scheduler.interfaces.SapsPropertiesConstants;
+import saps.common.core.dto.JobRequestDTO;
+import saps.common.core.dto.JobResponseDTO;
+import saps.common.core.model.SapsJob;
+import saps.common.utils.SapsPropertiesConstants;
 import saps.scheduler.core.arrebol.exceptions.GetCountsSlotsException;
 import saps.scheduler.core.arrebol.exceptions.GetJobException;
 import saps.scheduler.core.arrebol.exceptions.SubmitJobException;
 import saps.scheduler.core.arrebol.http.HttpWrapper;
+
 
 // TODO implement tests
 public class ArrebolRequestsHelper {

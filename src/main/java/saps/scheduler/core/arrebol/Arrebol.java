@@ -2,9 +2,9 @@
 package saps.scheduler.core.arrebol;
 
 import java.util.List;
-import saps.scheduler.interfaces.JobResponseDTO;
-import saps.scheduler.interfaces.SapsImage;
-import saps.scheduler.interfaces.SapsJob;
+import saps.common.core.dto.JobResponseDTO;
+import saps.common.core.model.SapsImage;
+import saps.common.core.model.SapsJob;
 import saps.scheduler.core.arrebol.exceptions.GetCountsSlotsException;
 import saps.scheduler.core.arrebol.exceptions.GetJobException;
 import saps.scheduler.core.arrebol.exceptions.SubmitJobException;

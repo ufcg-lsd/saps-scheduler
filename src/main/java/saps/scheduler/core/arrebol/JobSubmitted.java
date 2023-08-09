@@ -1,7 +1,7 @@
 /* (C)2020 */
 package saps.scheduler.core.arrebol;
 
-import saps.scheduler.interfaces.SapsImage;
+import saps.common.core.model.SapsImage;
 
 import java.util.Objects;
 

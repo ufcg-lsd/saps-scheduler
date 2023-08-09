@@ -2,13 +2,28 @@ package saps.scheduler.core;
 
 import java.util.*;
 import org.apache.log4j.Logger;
-import saps.scheduler.interfaces.*;
+
+import saps.catalog.core.Catalog;
+import saps.catalog.core.jdbc.JDBCCatalog;
+import saps.catalog.core.retry.CatalogUtils;
+import saps.common.core.dto.*;
+import saps.common.core.model.SapsImage;
+import saps.common.core.model.SapsJob;
+import saps.common.core.model.SapsTask;
+import saps.common.core.model.enums.ImageTaskState;
+import saps.common.utils.ExecutionScriptTag;
+import saps.common.utils.ExecutionScriptTagUtil;
+import saps.common.utils.SapsPropertiesConstants;
+import saps.common.utils.SapsPropertiesUtil;
 import saps.scheduler.core.arrebol.Arrebol;
 import saps.scheduler.core.arrebol.ArrebolUtils;
 import saps.scheduler.core.arrebol.DefaultArrebol;
 import saps.scheduler.core.arrebol.JobSubmitted;
 import saps.scheduler.core.selector.DefaultRoundRobin;
 import saps.scheduler.core.selector.Selector;
+import saps.scheduler.interfaces.Scheduler;
+
+
 
 public class DefaultScheduler implements Scheduler {
 
@@ -342,15 +357,18 @@ public class DefaultScheduler implements Scheduler {
     }
   }
 
+  //reavaliar o retorno desse método
   protected boolean updateStateInCatalog(SapsImage task, ImageTaskState state, String status,
       String error, String arrebolJobId, String message) {
+
+    CatalogUtils.updateState(catalog, task);
         
     task.setState(state);
     task.setStatus(status);
     task.setError(error);
     task.setArrebolJobId(arrebolJobId);
     
-    return CatalogUtils.updateState(catalog, task);
+   return true;
   }
 
   private void addTimestampTaskInCatalog(SapsImage task, String message) {

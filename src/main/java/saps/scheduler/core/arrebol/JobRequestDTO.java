@@ -1,6 +1,6 @@
 package saps.scheduler.core.arrebol;
 
-import saps.scheduler.interfaces.SapsJob;
+import saps.common.core.model.SapsJob;
 
 public class JobRequestDTO {
 

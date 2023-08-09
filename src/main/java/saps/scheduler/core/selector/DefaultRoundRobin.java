@@ -4,7 +4,7 @@ package saps.scheduler.core.selector;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import saps.scheduler.interfaces.SapsImage;
+import saps.common.core.model.SapsImage;
 
 public class DefaultRoundRobin implements Selector {
 
