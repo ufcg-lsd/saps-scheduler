@@ -37,10 +37,18 @@ public class SchedulerMain {
 
     LOGGER.info("Saps Controller starting.");
 
-    while(true) {
-      sapsController.recovery();
-      sapsController.schedule();
-      sapsController.checker();
-    }
+
+	while (true) {
+    sapsController.recovery();
+    Thread.sleep(1000); // Pausa de 1 segundo (1000 milissegundos)
+    
+    sapsController.schedule();
+    Thread.sleep(2000); // Pausa de 2 segundos (2000 milissegundos)
+    
+    sapsController.checker();
+    Thread.sleep(500); // Pausa de 0,5 segundos (500 milissegundos)
+
+	}
+    
   }
 }
