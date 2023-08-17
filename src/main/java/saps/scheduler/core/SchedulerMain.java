@@ -40,13 +40,13 @@ public class SchedulerMain {
 
 	while (true) {
     sapsController.recovery();
-    Thread.sleep(1000); // Pausa de 1 segundo (1000 milissegundos)
+    Thread.sleep(5000);
     
     sapsController.schedule();
-    Thread.sleep(2000); // Pausa de 2 segundos (2000 milissegundos)
+    Thread.sleep(5000); 
     
     sapsController.checker();
-    Thread.sleep(500); // Pausa de 0,5 segundos (500 milissegundos)
+    Thread.sleep(5000); 
 
 	}
     
