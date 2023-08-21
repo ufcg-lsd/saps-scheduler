@@ -68,15 +68,10 @@ public class DefaultScheduler implements Scheduler {
     return SapsPropertiesUtil.checkProperties(properties, propertiesSet);
   }
 
-  /**
-   * This function retrieves consistency between the information present in Catalog and Arrebol, and
-   * starts the list of submitted jobs.
-   */
-    public List<SapsImage> recovery() {
+   
+    public void recovery() {
     List<SapsImage> tasksInProcessingState = getProcessingTasksInCatalog();
     List<SapsImage> tasksForPopulateSubmittedJobList = new ArrayList<>();
-
-    List<SapsImage> updatedTasks = new ArrayList<>();
 
       for (SapsImage task : tasksInProcessingState) {
         if (task.getArrebolJobId().equals(SapsImage.NONE_ARREBOL_JOB_ID)) {
@@ -98,7 +93,6 @@ public class DefaultScheduler implements Scheduler {
               arrebolJobId,
               "updates task [" + task.getTaskId() + "] with Arrebol job ID [" + arrebolJobId + "]");
           tasksForPopulateSubmittedJobList.add(task);
-          updatedTasks.add(task);
         } 
       }
       else {
@@ -106,12 +100,10 @@ public class DefaultScheduler implements Scheduler {
         arrebol.addJobInList(new JobSubmitted(arrebolJobId, task));
       }
     };
-
     arrebol.populateJobList(tasksForPopulateSubmittedJobList);
-    return updatedTasks;
   }
 
-  /**
+/**
    * This function apply rollback in task state and updates in Catalog
    *
    * @param task task to be apply rollback
@@ -119,25 +111,24 @@ public class DefaultScheduler implements Scheduler {
   private void rollBackTaskState(SapsImage task) {
     ImageTaskState previousState = getPreviousState(task.getState());
     updateStateInCatalog(
-        task, previousState, SapsImage.AVAILABLE, SapsImage.NON_EXISTENT_DATA,
-        SapsImage.NONE_ARREBOL_JOB_ID, "updates task [" + task.getTaskId() + "] with previus state ["
-        + previousState.getValue() + "]");
+        task,
+        previousState,
+        SapsImage.AVAILABLE,
+        SapsImage.NON_EXISTENT_DATA,
+        SapsImage.NONE_ARREBOL_JOB_ID,
+        "updates task ["
+            + task.getTaskId()
+            + "] with previus state ["
+            + previousState.getValue()
+            + "]");
   }
 
-  /** This function schedules up to tasks. */
-  public List<SapsImage> schedule() {
+   public void schedule() {
     List<SapsImage> selectedTasks = selectTasks();
     submitTasks(selectedTasks);
-
-    return selectedTasks;
   }
 
-  /**
-   * This function selects tasks following a strategy for submit in Arrebol.
-   *
-   * @return selected tasks list
-   */
-  public List<SapsImage> selectTasks() {
+  protected List<SapsImage> selectTasks() {
     List<SapsImage> selectedTasks = new LinkedList<SapsImage>();
     ImageTaskState[] states = {
       ImageTaskState.READY, ImageTaskState.DOWNLOADED, ImageTaskState.CREATED
@@ -146,7 +137,7 @@ public class DefaultScheduler implements Scheduler {
     int countUpToTasks = getCountSlotsInArrebol("default");
 
     for (ImageTaskState state : states) {
-      List<SapsImage> selectedTasksInCurrentState = selectTasksByState(countUpToTasks, state);
+      List<SapsImage> selectedTasksInCurrentState = selectTasks(countUpToTasks, state);
       selectedTasks.addAll(selectedTasksInCurrentState);
       countUpToTasks -= selectedTasksInCurrentState.size();
     }
@@ -154,32 +145,31 @@ public class DefaultScheduler implements Scheduler {
     return selectedTasks;
   }
 
-  private List<SapsImage> selectTasksByState(int count, ImageTaskState state) {
+  //mudou o nome
+  private List<SapsImage> selectTasks(int count, final ImageTaskState state) {
     List<SapsImage> selectedTasks = new LinkedList<SapsImage>();
 
     if (count <= 0) {
       LOGGER.info(
           "There will be no selection of tasks in the "
-              + state.getValue() + " state because there is no capacity for new jobs in Arrebol");
-           return selectedTasks;
+              + state.getValue()
+              + " state because there is no capacity for new jobs in Arrebol");
+      return selectedTasks;
     }
 
     LOGGER.info("Trying select up to " + count + " tasks in state " + state);
 
-    List<SapsImage> tasks = getTasksInCatalog(state, "gets tasks with " + state.getValue() + " state");
+    List<SapsImage> tasks =
+        getTasksInCatalog(state, "gets tasks with " + state.getValue() + " state");
+
     Map<String, List<SapsImage>> tasksByUsers = mapUsers2Tasks(tasks);
+
     selectedTasks = selector.select(count, tasksByUsers);
 
     LOGGER.info("Number of selected tasks using " + selector.version() + ": " + selectedTasks.size());
-    
     return selectedTasks;
   }
 
-  /**
-   * This function submits tasks for Arrebol and updates state and job IDs in BD.
-   *
-   * @param selectedTasks selected task list for submit to Arrebol
-   */
   public void submitTasks(List<SapsImage> selectedTasks) {
     for (SapsImage task : selectedTasks) {
       ImageTaskState nextState = getNextState(task.getState());
@@ -214,14 +204,7 @@ public class DefaultScheduler implements Scheduler {
     }
   }
 
-  /**
-   * * This function associate each task with a specific user by building an map. After that, it
-   * sorts each task list by task priority.
-   *
-   * @param tasks list with tasks
-   * @return user map by tasks
-   */
-  protected Map<String, List<SapsImage>> mapUsers2Tasks(List<SapsImage> tasks) {
+    protected Map<String, List<SapsImage>> mapUsers2Tasks(List<SapsImage> tasks) {
     Map<String, List<SapsImage>> mapUsersToTasks = new TreeMap<String, List<SapsImage>>();
 
     for (SapsImage task : tasks) {
@@ -232,124 +215,120 @@ public class DefaultScheduler implements Scheduler {
     }
 
     for (Map.Entry<String, List<SapsImage>> entry : mapUsersToTasks.entrySet()) {
-      entry.getValue().sort(new Comparator<SapsImage>() {
-
-          @Override
-          public int compare(SapsImage task01, SapsImage task02) {
-            int priorityCompare = task02.getPriority() - task01.getPriority();
-            if (priorityCompare != 0) return priorityCompare;
-            else return task02.getCreationTime().compareTo(task02.getCreationTime());
-          }
-        });
+      entry.getValue().sort(
+              new Comparator<SapsImage>() {
+                @Override
+                public int compare(SapsImage task01, SapsImage task02) {
+                  int priorityCompare = task02.getPriority() - task01.getPriority();
+                  if (priorityCompare != 0) return priorityCompare;
+                  else return task02.getCreationTime().compareTo(task02.getCreationTime());
+                }
+              });
     }
+
     return mapUsersToTasks;
   }
 
   private String submitTaskToArrebol(SapsImage task, ImageTaskState state) throws Exception {
-    LOGGER.info(
-        "Trying submit task id ["
-            + task.getTaskId()
-            + "] in state "
-            + task.getState().getValue()
-            + " to arrebol");
+  LOGGER.info(
+      "Trying submit task id ["
+          + task.getTaskId()
+          + "] in state "
+          + task.getState().getValue()
+          + " to arrebol");
 
-    String repository = getRepository(state);
-    ExecutionScriptTag scriptInfo = getExecutionScriptTag(task, repository);
+  String repository = getRepository(state);
+  ExecutionScriptTag scriptInfo = getExecutionScriptTag(task, repository);
 
-    String formatImageWithDigest = getFormatImageWithDigest(scriptInfo, state, task);
-    String memoryUsage = scriptInfo.getMemoryUsage();
-    String cpuUsage = scriptInfo.getCpuUsage();
+  String formatImageWithDigest = getFormatImageWithDigest(scriptInfo, state, task);
+  String memoryUsage = scriptInfo.getMemoryUsage();
+  String cpuUsage = scriptInfo.getCpuUsage();
 
-    Map<String, String> requirements = new HashMap<String, String>();
-    requirements.put("image", formatImageWithDigest);
-    requirements.put(REQUIREMENTS_RAM_REQUEST, memoryUsage);
-    requirements.put(REQUIREMENTS_CPU_REQUEST, cpuUsage);
+  Map<String, String> requirements = new HashMap<String, String>();
+  requirements.put("image", formatImageWithDigest);
+  requirements.put(REQUIREMENTS_RAM_REQUEST, memoryUsage);
+  requirements.put(REQUIREMENTS_CPU_REQUEST, cpuUsage);
 
-    List<String> commands = SapsTask.buildCommandList(task, repository);
+  List<String> commands = SapsTask.buildCommandList(task, repository);
 
-    Map<String, String> metadata = new HashMap<String, String>();
+  Map<String, String> metadata = new HashMap<String, String>();
 
-    LOGGER.info("Creating SAPS task ...");
-    SapsTask sapsTask =
-        new SapsTask(
-            task.getTaskId() + "#" + formatImageWithDigest, requirements, commands, metadata);
-    LOGGER.info("SAPS task: " + sapsTask.toJSON().toString());
+  LOGGER.info("Creating SAPS task ...");
+  SapsTask sapsTask =
+      new SapsTask(
+          task.getTaskId() + "#" + formatImageWithDigest, requirements, commands, metadata);
+  LOGGER.info("SAPS task: " + sapsTask.toJSON().toString());
 
-    LOGGER.info("Creating SAPS job ...");
-    List<SapsTask> tasks = new LinkedList<SapsTask>();
-    tasks.add(sapsTask);
+  LOGGER.info("Creating SAPS job ...");
+  List<SapsTask> tasks = new LinkedList<SapsTask>();
+  tasks.add(sapsTask);
 
-    SapsJob imageJob = new SapsJob(task.getTaskId(), tasks);
-    LOGGER.info("SAPS job: " + imageJob.toJSON().toString());
+  SapsJob imageJob = new SapsJob(task.getTaskId(), tasks);
+  LOGGER.info("SAPS job: " + imageJob.toJSON().toString());
 
-    String jobId = submitJobInArrebol(imageJob, "add new job");
-    LOGGER.debug("Result submited job: " + jobId);
+  String jobId = submitJobInArrebol(imageJob, "add new job");
+  LOGGER.debug("Result submited job: " + jobId);
 
-    arrebol.addJobInList(new JobSubmitted(jobId, task));
-    LOGGER.info("Adding job in list");
+  arrebol.addJobInList(new JobSubmitted(jobId, task));
+  LOGGER.info("Adding job in list");
 
-    return jobId;
-  }
-  
+  return jobId;
+}
 
-  /**
-   * This function checks if each submitted job was finished. If exists finished jobs, for each job
-   * is updates state in Catalog and removes a job by list of submitted jobs to Arrebol.
-   */
   public void checker() {
-    List<JobSubmitted> submittedJobs = arrebol.returnAllJobsSubmitted();
-    List<JobSubmitted> finishedJobs = new LinkedList<JobSubmitted>();
+  List<JobSubmitted> submittedJobs = arrebol.returnAllJobsSubmitted();
+  List<JobSubmitted> finishedJobs = new LinkedList<JobSubmitted>();
 
-    LOGGER.info("Checking " + submittedJobs.size() + " submitted jobs for Arrebol service");
-    LOGGER.info("Submmitteds jobs list: " + submittedJobs.toString());
+  LOGGER.info("Checking " + submittedJobs.size() + " submitted jobs for Arrebol service");
+  LOGGER.info("Submmitteds jobs list: " + submittedJobs.toString());
 
-    for (JobSubmitted job : submittedJobs) {
-      System.out.println(job);
-      String jobId = job.getJobId();
-      SapsImage task = job.getImageTask();
+  for (JobSubmitted job : submittedJobs) {
+    System.out.println(job);
+    String jobId = job.getJobId();
+    SapsImage task = job.getImageTask();
 
-      JobResponseDTO jobResponse = getJobByIdInArrebol(jobId, "gets job by ID [" + jobId + "]");
-      LOGGER.debug("Job [" + jobId + "] information returned from Arrebol: " + jobResponse);
+    JobResponseDTO jobResponse = getJobByIdInArrebol(jobId, "gets job by ID [" + jobId + "]");
+    LOGGER.debug("Job [" + jobId + "] information returned from Arrebol: " + jobResponse);
 
-      boolean checkFinish = checkJobWasFinish(jobResponse);
-      if (checkFinish) {
-        LOGGER.info("Job [" + jobId + "] has been finished");
+    boolean checkFinish = checkJobWasFinish(jobResponse);
+    if (checkFinish) {
+      LOGGER.info("Job [" + jobId + "] has been finished");
 
-        boolean checkOK = checkJobFinishedWithSucess(jobResponse);
+      boolean checkOK = checkJobFinishedWithSucess(jobResponse);
 
-        if (checkOK) {
-          LOGGER.info("Job [" + jobId + "] has been finished with success");
+      if (checkOK) {
+        LOGGER.info("Job [" + jobId + "] has been finished with success");
 
-          ImageTaskState nextState = getNextState(task.getState());
+        ImageTaskState nextState = getNextState(task.getState());
 
-          updateStateInCatalog(
-              task,
-              nextState,
-              SapsImage.AVAILABLE,
-              SapsImage.NON_EXISTENT_DATA,
-              SapsImage.NONE_ARREBOL_JOB_ID,
-              "updates task ["
-                  + task.getTaskId()
-                  + "] with next state ["
-                  + nextState.getValue()
-                  + "]");
-        } else {
-          LOGGER.info("Job [" + jobId + "] has been finished with failure");
+        updateStateInCatalog(
+            task,
+            nextState,
+            SapsImage.AVAILABLE,
+            SapsImage.NON_EXISTENT_DATA,
+            SapsImage.NONE_ARREBOL_JOB_ID,
+            "updates task ["
+                + task.getTaskId()
+                + "] with next state ["
+                + nextState.getValue()
+                + "]");
+      } else {
+        LOGGER.info("Job [" + jobId + "] has been finished with failure");
 
-          updateStateInCatalog(
-              task,
-              ImageTaskState.FAILED,
-              SapsImage.AVAILABLE,
-              "error while execute " + task.getState().getValue() + " phase",
-              SapsImage.NONE_ARREBOL_JOB_ID,
-              "updates task [" + task.getTaskId() + "] with failed state");
-        }
+        updateStateInCatalog(
+            task,
+            ImageTaskState.FAILED,
+            SapsImage.AVAILABLE,
+            "error while execute " + task.getState().getValue() + " phase",
+            SapsImage.NONE_ARREBOL_JOB_ID,
+            "updates task [" + task.getTaskId() + "] with failed state");
+      }
 
-        addTimestampTaskInCatalog(task, "updates task [" + task.getTaskId() + "] timestamp");
+      addTimestampTaskInCatalog(task, "updates task [" + task.getTaskId() + "] timestamp");
 
-        finishedJobs.add(job);
-      } else LOGGER.info("Job [" + jobId + "] has NOT been finished");
-    }
+      finishedJobs.add(job);
+    } else LOGGER.info("Job [" + jobId + "] has NOT been finished");
+  }
 
     for (JobSubmitted jobFinished : finishedJobs) {
       LOGGER.info("Removing job [" + jobFinished.getJobId() + "] from the submitted job list");
@@ -379,29 +358,33 @@ public class DefaultScheduler implements Scheduler {
     return ArrebolUtils.submitJob(arrebol, imageJob, message);
   }
 
-  public boolean checkJobWasFinish(JobResponseDTO jobResponse) {
-
+  private boolean checkJobWasFinish(JobResponseDTO jobResponse) {
     String jobId = jobResponse.getId();
     String jobState = jobResponse.getJobState().toUpperCase();
 
-    LOGGER.info("Checking if job ["+ jobId +"] was finished. State job: { " + jobState + "}");
+    LOGGER.info("Checking if job [" + jobId + "] was finished");
+    LOGGER.info("State job [" + jobId + "]: " + jobState);
 
     if (jobState.compareTo(TaskResponseDTO.STATE_FAILED) != 0
-         && jobState.compareTo(TaskResponseDTO.STATE_FINISHED) != 0) return false;
-    
-        return true;
+        && jobState.compareTo(TaskResponseDTO.STATE_FINISHED) != 0) return false;
+
+    return true;
   }
 
-  public boolean checkJobFinishedWithSucess(JobResponseDTO jobResponse) {
+  private boolean checkJobFinishedWithSucess(JobResponseDTO jobResponse) {
+
     for (TaskResponseDTO task : jobResponse.getTasks()) {
       TaskSpecResponseDTO taskSpec = task.getTaskSpec();
 
       for (CommandResponseDTO command : taskSpec.getCommands()) {
+
         String commandDesc = command.getCommand();
         String commandState = command.getState();
         Integer commandExitCode = command.getExitCode();
 
-        LOGGER.info("Command: " + commandDesc + ", State: " + commandState + ", Exit code: " + commandExitCode);
+        LOGGER.info("Command: " + commandDesc);
+        LOGGER.info("State:" + commandState);
+        LOGGER.info("Exit code: " + commandExitCode);
 
         if (commandExitCode != 0 || !commandState.equals(TaskResponseDTO.STATE_FINISHED))
           return false;
@@ -410,7 +393,7 @@ public class DefaultScheduler implements Scheduler {
     return true;
   }
 
-  ImageTaskState getNextState(ImageTaskState currentState) {
+   private ImageTaskState getNextState(ImageTaskState currentState) {
     Map<ImageTaskState, ImageTaskState> statesMap = new HashMap<>();
 
     statesMap.put(ImageTaskState.CREATED, ImageTaskState.DOWNLOADING);
@@ -436,10 +419,10 @@ public class DefaultScheduler implements Scheduler {
     return statesMap.get(currentState);
   }
 
-  private ExecutionScriptTag getExecutionScriptTag(SapsImage task, String repository) throws Exception {
+  private ExecutionScriptTag getExecutionScriptTag(SapsImage task, String repository)
+      throws Exception {
     String tagsFilePath = System.getProperty(EXECUTION_TAGS_FILE_PATH_KEY);
     String tag;
-    
     if (repository.equals(ExecutionScriptTagUtil.PROCESSING)) tag = task.getProcessingTag();
     else if (repository.equals(ExecutionScriptTagUtil.PRE_PROCESSING)) tag = task.getPreprocessingTag();
     else tag = task.getInputdownloadingTag();
@@ -447,13 +430,14 @@ public class DefaultScheduler implements Scheduler {
     return ExecutionScriptTagUtil.getExecutionScriptTag(tagsFilePath, tag, repository);
   }
 
-  private String getFormatImageWithDigest(ExecutionScriptTag imageDockerInfo, ImageTaskState state, SapsImage task) {
-    if (state == ImageTaskState.RUNNING)
-      return imageDockerInfo.getDockerRepository() + "@" + task.getDigestProcessing();
-    else if (state == ImageTaskState.PREPROCESSING)
-      return imageDockerInfo.getDockerRepository() + "@" + task.getDigestPreprocessing();
-    else return imageDockerInfo.getDockerRepository() + "@" + task.getDigestInputdownloading();
-  }
+  private String getFormatImageWithDigest(
+        ExecutionScriptTag imageDockerInfo, ImageTaskState state, SapsImage task) {
+      if (state == ImageTaskState.RUNNING)
+        return imageDockerInfo.getDockerRepository() + "@" + task.getDigestProcessing();
+      else if (state == ImageTaskState.PREPROCESSING)
+        return imageDockerInfo.getDockerRepository() + "@" + task.getDigestPreprocessing();
+      else return imageDockerInfo.getDockerRepository() + "@" + task.getDigestInputdownloading();
+    }
 
   private String getRepository(ImageTaskState state) {
     if (state == ImageTaskState.RUNNING) return ExecutionScriptTagUtil.PROCESSING;
@@ -462,18 +446,18 @@ public class DefaultScheduler implements Scheduler {
   }
 
   private int getCountSlotsInArrebol(String queueId) {
-    return ArrebolUtils.getCountSlots(arrebol, queueId);
-  }
+      return ArrebolUtils.getCountSlots(arrebol, queueId);
+    }
 
-  JobResponseDTO getJobByIdInArrebol(String jobId, String message) {
+  private JobResponseDTO getJobByIdInArrebol(String jobId, String message) {
     return ArrebolUtils.getJobById(arrebol, jobId, message);
   }
 
-  protected List<JobResponseDTO> getJobByNameInArrebol(String jobName, String message) {
-    return ArrebolUtils.getJobByName(arrebol, jobName, message);
-  }
+  private List<JobResponseDTO> getJobByNameInArrebol(String jobName, String message) {
+      return ArrebolUtils.getJobByName(arrebol, jobName, message);
+    }
 
-  private List<SapsImage> getTasksInCatalog(ImageTaskState state, String message) {
+  private List<SapsImage> getTasksInCatalog(ImageTaskState state, String message) { 
     return CatalogUtils.getTasks(catalog, state);
   }
 
