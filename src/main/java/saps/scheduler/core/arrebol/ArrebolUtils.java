@@ -14,6 +14,7 @@ import saps.scheduler.core.arrebol.retry.GetJobByNameRetry;
 import saps.scheduler.core.arrebol.retry.LenQueueRetry;
 import saps.scheduler.core.arrebol.retry.SubmitJobRetry;
 
+
 public class ArrebolUtils {
 
   public static final Logger LOGGER = Logger.getLogger(ArrebolUtils.class);
@@ -103,4 +104,9 @@ public class ArrebolUtils {
   public static String submitJob(Arrebol arrebol, SapsJob imageJob, String message) {
     return retry(new SubmitJobRetry(arrebol, imageJob), ARREBOL_DEFAULT_SLEEP_SECONDS, message);
   }
+
+  private static String retry(SubmitJobRetry function, int arrebolDefaultSleepSeconds, String message) {
+    return null;
+  }
+
 }
