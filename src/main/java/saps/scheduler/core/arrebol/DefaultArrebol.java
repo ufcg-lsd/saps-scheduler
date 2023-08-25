@@ -1,6 +1,7 @@
 /* (C)2020 */
 package saps.scheduler.core.arrebol;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -58,7 +59,9 @@ public class DefaultArrebol implements Arrebol {
 
   // TODO implement method
   public List<JobResponseDTO> checkStatusJobByName(String JobName) throws GetJobException {
-    return null;
+    List<JobResponseDTO> emptyTest = new ArrayList<>();
+    return emptyTest;
+    //return null;
     // return arrebolRequestHelper.getJobByName(jobName);
   }
 

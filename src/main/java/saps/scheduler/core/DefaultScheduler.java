@@ -27,13 +27,11 @@ import saps.scheduler.interfaces.Scheduler;
 
 public class DefaultScheduler implements Scheduler {
 
-  // Constants
   public static final Logger LOGGER = Logger.getLogger(DefaultScheduler.class);
   public static final String EXECUTION_TAGS_FILE_PATH_KEY = "EXECUTION_SCRIPT_TAGS_FILE_PATH";
   public static final String REQUIREMENTS_CPU_REQUEST = "CPUUsage";
   public static final String REQUIREMENTS_RAM_REQUEST = "RAMUsage";
 
-  // Saps Controller Variables
   private Selector selector;
 
   private Catalog catalog;
@@ -69,7 +67,7 @@ public class DefaultScheduler implements Scheduler {
   }
 
    
-    public void recovery() {
+  public void recovery() {
     List<SapsImage> tasksInProcessingState = getProcessingTasksInCatalog();
     List<SapsImage> tasksForPopulateSubmittedJobList = new ArrayList<>();
 
@@ -77,13 +75,15 @@ public class DefaultScheduler implements Scheduler {
         if (task.getArrebolJobId().equals(SapsImage.NONE_ARREBOL_JOB_ID)) {
         
           String jobName = task.getState().getValue() + "-" + task.getTaskId();
+          LOGGER.info("--- Starting getJobByName In Arrebol ---");
           List<JobResponseDTO> jobsWithEqualJobName = getJobByNameInArrebol(jobName, "gets job by name [" + jobName + "]");
+          LOGGER.info("Returned list: " + jobsWithEqualJobName);
 
           if (jobsWithEqualJobName.isEmpty()) {
             rollBackTaskState(task);
           }
 
-        else if (jobsWithEqualJobName.size() == 1) {
+        else {
           String arrebolJobId = jobsWithEqualJobName.get(0).getId();
           updateStateInCatalog(
               task,
@@ -145,7 +145,6 @@ public class DefaultScheduler implements Scheduler {
     return selectedTasks;
   }
 
-  //mudou o nome
   private List<SapsImage> selectTasks(int count, final ImageTaskState state) {
     List<SapsImage> selectedTasks = new LinkedList<SapsImage>();
 
@@ -221,7 +220,7 @@ public class DefaultScheduler implements Scheduler {
                 public int compare(SapsImage task01, SapsImage task02) {
                   int priorityCompare = task02.getPriority() - task01.getPriority();
                   if (priorityCompare != 0) return priorityCompare;
-                  else return task02.getCreationTime().compareTo(task02.getCreationTime());
+                  else return task02.getCreationTime().compareTo(task01.getCreationTime());
                 }
               });
     }
@@ -253,13 +252,11 @@ public class DefaultScheduler implements Scheduler {
 
   Map<String, String> metadata = new HashMap<String, String>();
 
-  LOGGER.info("Creating SAPS task ...");
   SapsTask sapsTask =
       new SapsTask(
           task.getTaskId() + "#" + formatImageWithDigest, requirements, commands, metadata);
   LOGGER.info("SAPS task: " + sapsTask.toJSON().toString());
 
-  LOGGER.info("Creating SAPS job ...");
   List<SapsTask> tasks = new LinkedList<SapsTask>();
   tasks.add(sapsTask);
 
@@ -290,13 +287,22 @@ public class DefaultScheduler implements Scheduler {
     JobResponseDTO jobResponse = getJobByIdInArrebol(jobId, "gets job by ID [" + jobId + "]");
     LOGGER.debug("Job [" + jobId + "] information returned from Arrebol: " + jobResponse);
 
-    boolean checkFinish = checkJobWasFinish(jobResponse);
-    if (checkFinish) {
-      LOGGER.info("Job [" + jobId + "] has been finished");
+    if (!wasJobFound(jobResponse)) {
+        LOGGER.info(
+            "Job ["
+                + jobId
+                + "] not found in Arrebol service, applying status rollback to task ["
+                + task.getTaskId()
+                + "]");
 
-      boolean checkOK = checkJobFinishedWithSucess(jobResponse);
+        rollBackTaskState(task);
+        finishedJobs.add(job);
+        continue;
+      }
 
-      if (checkOK) {
+    if (checkJobWasFinish(jobResponse)) {
+
+      if (checkJobFinishedWithSucess(jobResponse)) {
         LOGGER.info("Job [" + jobId + "] has been finished with success");
 
         ImageTaskState nextState = getNextState(task.getState());
@@ -336,16 +342,25 @@ public class DefaultScheduler implements Scheduler {
     }
   }
 
-  //reavaliar o retorno desse método
+  private boolean wasJobFound(JobResponseDTO jobResponse) {
+    JobResponseDTO jobResponseDTO = ArrebolUtils.getJobById(arrebol, jobResponse.getId(), "Searching for job in arrebol");
+
+    if (jobResponseDTO != null) {
+      return true;
+    }
+
+    return false;
+  }
+
   protected boolean updateStateInCatalog(SapsImage task, ImageTaskState state, String status,
       String error, String arrebolJobId, String message) {
-
-    CatalogUtils.updateState(catalog, task);
         
     task.setState(state);
     task.setStatus(status);
     task.setError(error);
     task.setArrebolJobId(arrebolJobId);
+
+    CatalogUtils.updateState(catalog, task);
     
    return true;
   }
