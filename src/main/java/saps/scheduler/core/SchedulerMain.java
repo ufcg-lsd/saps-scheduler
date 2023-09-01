@@ -38,17 +38,16 @@ public class SchedulerMain {
     LOGGER.info("Saps Controller starting.");
 
 
-	while (true) {
-    sapsController.recovery();
-    Thread.sleep(5000);
-    
-    sapsController.schedule();
-    Thread.sleep(5000); 
-    
-    sapsController.checker();
-    Thread.sleep(5000); 
+    while (true) {
+      sapsController.recovery();
+      Thread.sleep(5000);
+      
+      sapsController.schedule();
+      Thread.sleep(5000); 
+      
+      sapsController.checker();
+      Thread.sleep(5000); 
 
-	}
-    
+    }
   }
 }

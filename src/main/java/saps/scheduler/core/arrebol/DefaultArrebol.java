@@ -17,11 +17,11 @@ public class DefaultArrebol implements Arrebol {
   private static final int ARREBOL_MAX_WAITING_JOBS = 20;
 
   private final ArrebolRequestsHelper arrebolRequestHelper;
-  // private final Properties properties;
+
   private List<JobSubmitted> submittedJobID;
 
   public DefaultArrebol(Properties properties) {
-    // this.properties = properties;
+ 
     this.arrebolRequestHelper = new ArrebolRequestsHelper(properties);
     this.submittedJobID = new LinkedList<JobSubmitted>();
   }
@@ -57,12 +57,9 @@ public class DefaultArrebol implements Arrebol {
     return arrebolRequestHelper.getJob(jobId);
   }
 
-  // TODO implement method
   public List<JobResponseDTO> checkStatusJobByName(String JobName) throws GetJobException {
-    List<JobResponseDTO> emptyTest = new ArrayList<>();
-    return emptyTest;
-    //return null;
-    // return arrebolRequestHelper.getJobByName(jobName);
+    List<JobResponseDTO> emptyList = new ArrayList<>();
+    return emptyList;
   }
 
   @Override

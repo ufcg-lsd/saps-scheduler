@@ -22,10 +22,8 @@ import saps.scheduler.core.arrebol.exceptions.SubmitJobException;
 import saps.scheduler.core.arrebol.http.HttpWrapper;
 
 
-// TODO implement tests
 public class ArrebolRequestsHelper {
 
-  // TODO review this names
   private final Properties properties;
   private final String arrebolBaseUrl;
   private final Gson gson;

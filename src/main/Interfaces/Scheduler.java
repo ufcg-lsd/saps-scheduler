@@ -25,7 +25,6 @@ public interface Scheduler {
      * These methods above shouldn't be public. 
      * We'll change they visibility as soon as we finish testing
      */
-
     public List<SapsImage> selectTasks();
 
 }

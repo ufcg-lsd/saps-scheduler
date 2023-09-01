@@ -203,7 +203,7 @@ public class DefaultScheduler implements Scheduler {
     }
   }
 
-    protected Map<String, List<SapsImage>> mapUsers2Tasks(List<SapsImage> tasks) {
+  protected Map<String, List<SapsImage>> mapUsers2Tasks(List<SapsImage> tasks) {
     Map<String, List<SapsImage>> mapUsersToTasks = new TreeMap<String, List<SapsImage>>();
 
     for (SapsImage task : tasks) {
@@ -362,7 +362,7 @@ public class DefaultScheduler implements Scheduler {
 
     CatalogUtils.updateState(catalog, task);
     
-   return true;
+    return true;
   }
 
   private void addTimestampTaskInCatalog(SapsImage task, String message) {
@@ -425,11 +425,8 @@ public class DefaultScheduler implements Scheduler {
     HashMap<ImageTaskState, ImageTaskState> statesMap = new HashMap<>();
 
     statesMap.put(ImageTaskState.DOWNLOADING, ImageTaskState.CREATED);
-    statesMap.put(ImageTaskState.DOWNLOADED, ImageTaskState.DOWNLOADING);
     statesMap.put(ImageTaskState.PREPROCESSING, ImageTaskState.DOWNLOADED);
-    statesMap.put(ImageTaskState.READY, ImageTaskState.PREPROCESSING);
     statesMap.put(ImageTaskState.RUNNING, ImageTaskState.READY);
-    statesMap.put(ImageTaskState.FINISHED, ImageTaskState.RUNNING);
 
     return statesMap.get(currentState);
   }
