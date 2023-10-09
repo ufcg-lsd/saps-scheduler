@@ -304,9 +304,15 @@ public class DefaultScheduler implements Scheduler {
 
       if (checkJobFinishedWithSucess(jobResponse)) {
         LOGGER.info("Job [" + jobId + "] has been finished with success");
+        LOGGER.info("Current state of task: " + task.getState());
 
         ImageTaskState nextState = getNextState(task.getState());
 
+        if (nextState == null) {
+          nextState = ImageTaskState.FINISHED;
+        } 
+
+        LOGGER.info("Updated state of task: " + nextState);
         updateStateInCatalog(
             task,
             nextState,
