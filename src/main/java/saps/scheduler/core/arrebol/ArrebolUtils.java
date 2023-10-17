@@ -103,4 +103,5 @@ public class ArrebolUtils {
   public static String submitJob(Arrebol arrebol, SapsJob imageJob, String message) {
     return retry(new SubmitJobRetry(arrebol, imageJob), ARREBOL_DEFAULT_SLEEP_SECONDS, message);
   }
+
 }

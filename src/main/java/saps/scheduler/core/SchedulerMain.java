@@ -24,7 +24,7 @@ public class SchedulerMain {
           "The path to the execution tags file cannot be null or empty");
     }
 
-    System.setProperty(Scheduler.EXECUTION_TAGS_FILE_PATH_KEY, executionTagsFilePath);
+    System.setProperty(DefaultScheduler.EXECUTION_TAGS_FILE_PATH_KEY, executionTagsFilePath);
 
     LOGGER.info("Loading properties...");
     final Properties properties = new Properties();
@@ -32,9 +32,22 @@ public class SchedulerMain {
     properties.load(input);
 
     LOGGER.info("Trying to start Saps Controller");
-    Scheduler sapsController = new Scheduler(properties);
-    sapsController.start();
+    DefaultScheduler sapsController = new DefaultScheduler(properties);
 
-    LOGGER.info("Saps Controller started.");
+
+    LOGGER.info("Saps Controller starting.");
+
+
+    while (true) {
+      sapsController.recovery();
+      Thread.sleep(5000);
+      
+      sapsController.schedule();
+      Thread.sleep(5000); 
+      
+      sapsController.checker();
+      Thread.sleep(5000); 
+
+    }
   }
 }

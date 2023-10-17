@@ -5,6 +5,7 @@ import saps.common.core.dto.JobResponseDTO;
 import saps.scheduler.core.arrebol.Arrebol;
 import saps.scheduler.core.arrebol.exceptions.GetJobException;
 
+
 public class GetJobByIdRetry implements ArrebolRetry<JobResponseDTO> {
 
   private Arrebol arrebol;

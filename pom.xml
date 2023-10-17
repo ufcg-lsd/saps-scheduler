@@ -147,12 +147,47 @@
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.10.19</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.12.4</version>
+            <scope>test</scope>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-core</artifactId>
+            <version>2.0.9</version>
+            <scope>test</scope>
+        </dependency>
+
+    	<dependency>
+        	<groupId>org.powermock</groupId>
+        	<artifactId>powermock-module-junit4</artifactId>
+        	<version>2.0.9</version>
+        	<scope>test</scope>
+    	</dependency>
+    
+    	<dependency>
+        	<groupId>org.powermock</groupId>
+        	<artifactId>powermock-api-mockito2</artifactId>
+        	<version>2.0.9</version>
+        	<scope>test</scope>
+    	</dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+        </dependency>
+            
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
+
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -163,21 +198,6 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.13</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.10.19</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-mockito-release-full</artifactId>
-			<version>1.6.4</version>
-			<type>pom</type>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -326,6 +346,7 @@
 			<artifactId>saps-catalog</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.diffplug.spotless</groupId>
 			<artifactId>spotless-maven-plugin</artifactId>
